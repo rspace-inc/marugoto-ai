@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>まるごとAI — AIインフラを、すべての会社に。</title>
+<meta name="description" content="月10万円で叶う、オリジナル自社システム。御社専用のシステムをAIでゼロから作り、社内で使いこなせる担当者まで育てる。運営：株式会社アールスペース">
+<meta property="og:title" content="まるごとAI — AIインフラを、すべての会社に。">
+<meta property="og:description" content="月10万円で叶う、オリジナル自社システム。運営：株式会社アールスペース">
+<meta property="og:image" content="https://rspace-inc.github.io/marugoto-ai/ogp.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#04060c">
+<link rel="icon" href="../favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04060c; --bg2:#080c18; --panel:rgba(14,22,42,.55); --line:rgba(120,200,255,.16);
+  --text:#e9f1ff; --muted:#8a9bbd; --cyan:#45e6ff; --violet:#8a6cff; --orange:#ff8a1f; --red:#ff4d5e;
+  --mx:50vw; --my:50vh;
+  --en:'Space Grotesk','Noto Sans JP',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;line-height:1.8;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+::selection{background:var(--cyan);color:#000}
+
+/* ===== global layers ===== */
+.noise{position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.glow-follow{position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(600px circle at var(--mx) var(--my),rgba(69,230,255,.07),transparent 60%)}
+.progress{position:fixed;left:0;top:0;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--cyan),var(--violet),var(--orange));z-index:100}
+
+/* cursor */
+.cur-dot,.cur-ring{position:fixed;left:0;top:0;pointer-events:none;z-index:200;border-radius:50%;transform:translate(-50%,-50%)}
+.cur-dot{width:6px;height:6px;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+.cur-ring{width:38px;height:38px;border:1px solid rgba(69,230,255,.6);transition:width .25s,height .25s,border-color .25s,background .25s}
+.cur-ring.hover{width:72px;height:72px;border-color:var(--orange);background:rgba(255,138,31,.08)}
+.cur-label{position:fixed;left:0;top:0;pointer-events:none;z-index:201;font:600 10px var(--mono);letter-spacing:.15em;color:var(--orange);transform:translate(24px,18px);opacity:0;transition:opacity .2s}
+@media (hover:hover) and (pointer:fine){body.has-cursor,body.has-cursor a,body.has-cursor button{cursor:none}}
+@media not ((hover:hover) and (pointer:fine)){.cur-dot,.cur-ring,.cur-label{display:none}}
+
+/* loader */
+.loader{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;font-family:var(--mono);transition:opacity .6s,visibility .6s}
+.loader.done{opacity:0;visibility:hidden}
+.loader .ln{font-size:12px;letter-spacing:.3em;color:var(--muted)}
+.loader .pct{font:700 64px var(--en);color:var(--text)}
+.loader .bar{width:min(320px,70vw);height:1px;background:var(--line);position:relative;overflow:hidden}
+.loader .bar i{position:absolute;inset:0;background:var(--cyan);transform-origin:0;transform:scaleX(0)}
+
+/* ===== header ===== */
+header{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;align-items:center;justify-content:space-between;padding:18px clamp(16px,4vw,48px);backdrop-filter:blur(10px);background:linear-gradient(180deg,rgba(4,6,12,.85),rgba(4,6,12,0))}
+.logo{font:700 20px var(--en);letter-spacing:.04em;display:flex;align-items:center;gap:10px}
+.logo b{color:var(--orange)}
+.logo .pulse{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.hcta{font:600 13px 'Noto Sans JP';padding:10px 18px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);transition:.25s}
+.hcta:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ===== hero ===== */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:120px clamp(16px,6vw,96px) 80px;overflow:hidden}
+#net{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.grid-floor{position:absolute;left:-50%;right:-50%;bottom:-10%;height:55%;z-index:0;background-image:linear-gradient(rgba(69,230,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(69,230,255,.18) 1px,transparent 1px);background-size:60px 60px;transform:perspective(500px) rotateX(70deg);transform-origin:50% 0;mask-image:linear-gradient(180deg,transparent,#000 30%,#000 60%,transparent);animation:floor 6s linear infinite;opacity:.55}
+@keyframes floor{to{background-position:0 60px}}
+.hero-in{position:relative;z-index:2;max-width:1200px}
+.tag{display:inline-flex;align-items:center;gap:10px;font:600 12px var(--mono);letter-spacing:.2em;color:var(--cyan);padding:8px 14px;border:1px solid rgba(69,230,255,.3);border-radius:4px;background:rgba(69,230,255,.05)}
+.tag::before{content:"";width:6px;height:6px;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.hero h1{margin-top:28px;font-weight:900;font-size:clamp(40px,8.4vw,128px);line-height:1.08;letter-spacing:-.02em}
+.hero h1 .l{display:block}
+.grad{background:linear-gradient(100deg,var(--cyan) 0%,#a9f4ff 30%,var(--violet) 60%,var(--orange) 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s ease-in-out infinite}
+@keyframes shine{50%{background-position:100% 0}}
+.hero .lead{margin-top:28px;font-size:clamp(17px,2.1vw,26px);font-weight:700}
+.hero .lead em{font-style:normal;color:var(--orange)}
+.hero .sub{margin-top:12px;color:var(--muted);font-size:clamp(14px,1.4vw,16px);max-width:640px}
+.btns{margin-top:40px;display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.btn{position:relative;display:inline-flex;align-items:center;gap:12px;padding:20px 34px;border-radius:999px;font-weight:700;font-size:16px;color:#05070d;background:linear-gradient(100deg,var(--orange),#ffb15c);box-shadow:0 0 0 1px rgba(255,255,255,.1) inset,0 10px 40px rgba(255,138,31,.35);transition:box-shadow .3s;will-change:transform;overflow:hidden}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s}
+.btn:hover::after{transform:translateX(120%)}
+.btn:hover{box-shadow:0 0 0 1px rgba(255,255,255,.2) inset,0 14px 60px rgba(255,138,31,.6)}
+.btn .arr{transition:transform .3s}.btn:hover .arr{transform:translateX(4px)}
+.btn-note{font:500 12px var(--mono);color:var(--muted);letter-spacing:.08em}
+.hud{position:absolute;z-index:2;font:500 11px var(--mono);color:var(--muted);letter-spacing:.12em;line-height:1.7}
+.hud b{color:var(--cyan);font-weight:600}
+.hud.tl{left:clamp(16px,4vw,48px);bottom:28px}
+.hud.tr{right:clamp(16px,4vw,48px);bottom:28px;text-align:right}
+.rings{position:absolute;right:-8vw;top:50%;width:min(60vw,760px);aspect-ratio:1;transform:translateY(-50%);z-index:1;pointer-events:none;opacity:.8}
+.rings svg{width:100%;height:100%;overflow:visible}
+.spin{transform-origin:50% 50%;animation:spin 40s linear infinite}
+.spin.r{animation-direction:reverse;animation-duration:60s}
+.spin.f{animation-duration:18s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scroll-ind{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);z-index:2;width:1px;height:56px;background:linear-gradient(var(--cyan),transparent);overflow:hidden}
+.scroll-ind::after{content:"";position:absolute;left:0;top:-20px;width:1px;height:20px;background:#fff;animation:drop 1.8s infinite}
+@keyframes drop{to{top:56px}}
+
+/* ===== marquee ===== */
+.marquee{position:relative;z-index:2;border-block:1px solid var(--line);background:rgba(8,12,24,.7);overflow:hidden;padding:18px 0}
+.marquee .track{display:flex;gap:48px;width:max-content;animation:mq 40s linear infinite;font:700 clamp(18px,2.4vw,30px) var(--en);white-space:nowrap}
+.marquee .track span{display:flex;align-items:center;gap:48px;color:rgba(233,241,255,.85)}
+.marquee .track span::after{content:"✦";color:var(--orange);font-size:.7em}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ===== sections ===== */
+section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6vw,96px)}
+.wrap{max-width:1200px;margin:0 auto}
+.kicker{font:600 12px var(--mono);letter-spacing:.3em;color:var(--cyan);display:flex;align-items:center;gap:14px}
+.kicker::before{content:"";width:32px;height:1px;background:var(--cyan)}
+.h2{margin-top:20px;font-weight:900;font-size:clamp(30px,5vw,64px);line-height:1.2;letter-spacing:-.01em}
+.h2 .dim{color:var(--muted)}
+.p{margin-top:20px;color:var(--muted);font-size:clamp(15px,1.4vw,17px);max-width:720px}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(40px);filter:blur(8px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1),filter 1s}
+.rv.in{opacity:1;transform:none;filter:none}
+.rv.d1{transition-delay:.1s}.rv.d2{transition-delay:.2s}.rv.d3{transition-delay:.3s}.rv.d4{transition-delay:.4s}
+
+/* problem */
+.probs{margin-top:56px;display:grid;gap:0;border-top:1px solid var(--line)}
+.prob{display:grid;grid-template-columns:80px 1fr auto;align-items:center;gap:20px;padding:26px 0;border-bottom:1px solid var(--line);font-size:clamp(17px,2.2vw,28px);font-weight:700;transition:padding .35s,color .35s}
+.prob .n{font:500 13px var(--mono);color:var(--muted)}
+.prob .x{font:600 12px var(--mono);color:var(--red);letter-spacing:.2em;opacity:.8}
+.prob:hover{padding-left:16px;color:var(--cyan)}
+.answer{margin-top:72px;font-weight:900;font-size:clamp(24px,3.6vw,46px);line-height:1.45}
+.answer .hl{position:relative;color:var(--orange)}
+
+/* formula */
+.formula{margin-top:64px;display:grid;grid-template-columns:1fr auto 1fr auto 1.2fr;align-items:stretch;gap:20px}
+.op{display:flex;align-items:center;justify-content:center;font:300 clamp(36px,5vw,64px) var(--en);color:var(--muted)}
+.card{position:relative;border-radius:20px;padding:32px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(8px);transform-style:preserve-3d;transition:transform .2s ease-out,border-color .3s;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(420px circle at var(--cx,50%) var(--cy,50%),rgba(69,230,255,.14),transparent 50%);opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover::before{opacity:1}
+.card:hover{border-color:rgba(69,230,255,.4)}
+.card .ic{font:600 11px var(--mono);letter-spacing:.2em;color:var(--cyan)}
+.card h3{margin-top:14px;font:700 clamp(26px,3vw,38px) var(--en)}
+.card p{margin-top:10px;color:var(--muted);font-size:15px}
+.card.result{border:none;background:linear-gradient(var(--bg2),var(--bg2)) padding-box,conic-gradient(from var(--ang,0deg),var(--cyan),var(--violet),var(--orange),var(--cyan)) border-box;border:1px solid transparent;animation:ang 6s linear infinite}
+.card.result h3{color:var(--orange)}
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes ang{to{--ang:360deg}}
+
+/* works */
+.works{margin-top:64px;display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+.work{grid-column:span 6;display:flex;flex-direction:column}
+.work.big{grid-column:span 12;display:grid;grid-template-columns:1.25fr 1fr;gap:32px;align-items:center}
+.work .media{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:16/10}
+.work .media img,.work .media video{width:100%;height:100%;object-fit:cover;object-position:top;transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+.work:hover .media img{transform:scale(1.04)}
+.media::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px);pointer-events:none}
+.media .scan{position:absolute;left:0;right:0;height:30%;background:linear-gradient(180deg,transparent,rgba(69,230,255,.18),transparent);animation:scan 4s linear infinite;pointer-events:none;mix-blend-mode:screen}
+@keyframes scan{from{top:-30%}to{top:100%}}
+.media .live{position:absolute;left:14px;top:14px;z-index:2;font:600 10px var(--mono);letter-spacing:.2em;padding:6px 10px;border-radius:4px;background:rgba(0,0,0,.6);border:1px solid rgba(255,77,94,.5);color:#fff;display:flex;gap:8px;align-items:center}
+.media .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 1.2s infinite}
+.work .meta{padding:22px 4px 0}
+.work .no{font:600 12px var(--mono);color:var(--orange);letter-spacing:.2em}
+.work h3{margin-top:8px;font-size:clamp(20px,2.2vw,28px);font-weight:900}
+.work p{margin-top:8px;color:var(--muted);font-size:15px}
+.phones{grid-column:span 12;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.phone{position:relative;border-radius:28px;padding:10px;background:linear-gradient(160deg,#1a2238,#070a14);border:1px solid var(--line);transform-style:preserve-3d;transition:transform .2s ease-out}
+.phone .scr{border-radius:20px;overflow:hidden;aspect-ratio:9/15;position:relative;background:#000}
+.phone .scr img{width:100%;height:100%;object-fit:cover;object-position:top}
+.phone .cap{padding:16px 8px 6px}
+.phone .cap b{display:block;font-size:17px}
+.phone .cap span{font-size:13px;color:var(--muted)}
+.next{grid-column:span 12;border:1px dashed rgba(255,138,31,.5);border-radius:20px;padding:40px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between;background:rgba(255,138,31,.04)}
+.next b{font-size:clamp(20px,2.4vw,30px);font-weight:900}
+.next b em{font-style:normal;color:var(--orange)}
+.next a{font:600 14px var(--mono);color:var(--orange);letter-spacing:.1em}
+
+/* HAPPY orb */
+.orb-wrap{position:relative;aspect-ratio:1;max-width:520px;width:100%;margin:0 auto;cursor:pointer}
+#orb{width:100%;height:100%}
+.orb-ui{position:absolute;left:0;right:0;bottom:4%;text-align:center;font:600 11px var(--mono);letter-spacing:.25em;color:var(--muted)}
+.orb-ui b{color:var(--cyan)}
+.say{min-height:5.6em;margin-top:18px;padding:16px 18px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.35);font-family:var(--mono);font-size:13px;line-height:1.8;color:var(--muted)}
+.say .u{color:var(--text)}.say .a{color:var(--cyan)}
+
+/* metrics */
+.metrics{margin-top:64px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.metric{padding:40px;border-radius:20px;border:1px solid var(--line);background:var(--panel)}
+.metric .lbl{font-weight:700;font-size:17px}
+.metric .lbl small{display:block;font:500 12px var(--mono);color:var(--muted);letter-spacing:.15em;margin-bottom:6px}
+.metric .row{margin-top:24px;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+.metric .from{font:700 clamp(28px,3.4vw,44px) var(--en);color:var(--muted);text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:3px}
+.metric .to{font:700 clamp(64px,8vw,120px) var(--en);line-height:1;color:var(--cyan);text-shadow:0 0 40px rgba(69,230,255,.4)}
+.metric .to small{font-size:.35em;margin-left:4px;color:var(--text)}
+.metric .bar{margin-top:24px;height:6px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden}
+.metric .bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--red),var(--orange));transform-origin:0;transition:transform 2s cubic-bezier(.2,.7,.2,1) .3s}
+.metric.in .bar i{transform:scaleX(var(--k))}
+.metric .cut{margin-top:12px;font:600 13px var(--mono);color:var(--orange);letter-spacing:.1em}
+
+/* terminal */
+.term{margin-top:56px;border-radius:16px;border:1px solid var(--line);background:#03050a;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.6),0 0 0 1px rgba(69,230,255,.05)}
+.term .bar{display:flex;gap:8px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);font:500 12px var(--mono);color:var(--muted)}
+.term .bar i{width:10px;height:10px;border-radius:50%;background:#333}
+.term .bar i:nth-child(1){background:#ff5f57}.term .bar i:nth-child(2){background:#febc2e}.term .bar i:nth-child(3){background:#28c840}
+.term .bar span{margin-left:10px}
+.term pre{padding:24px;min-height:360px;font:400 clamp(12px,1.3vw,14px)/1.9 var(--mono);color:#cfe3ff;white-space:pre-wrap;word-break:break-all}
+.term .c{color:var(--cyan)}.term .o{color:var(--orange)}.term .g{color:#5dff9d}.term .m{color:var(--muted)}
+.caret{display:inline-block;width:8px;height:1.1em;background:var(--cyan);vertical-align:-3px;animation:pulse 1s steps(1) infinite}
+
+/* compare */
+.compare{margin-top:64px;display:grid;gap:28px}
+.cmp .lbl{display:flex;justify-content:space-between;gap:12px;font-weight:700;font-size:clamp(15px,1.6vw,18px);flex-wrap:wrap}
+.cmp .lbl span:last-child{font-family:var(--en)}
+.cmp .track{margin-top:12px;height:56px;border-radius:12px;background:rgba(255,255,255,.04);overflow:hidden;border:1px solid var(--line)}
+.cmp .fill{height:100%;transform-origin:0;transform:scaleX(0);transition:transform 1.8s cubic-bezier(.2,.7,.2,1)}
+.cmp.a .fill{background:repeating-linear-gradient(45deg,#2a3350 0 10px,#222a44 10px 20px)}
+.cmp.b .fill{background:linear-gradient(90deg,var(--orange),#ffc078);box-shadow:0 0 30px rgba(255,138,31,.6)}
+.compare.in .cmp.a .fill{transform:scaleX(1)}
+.compare.in .cmp.b .fill{transform:scaleX(.09)}
+.cmp.b .lbl span:last-child{color:var(--orange)}
+.note{margin-top:20px;font-size:12px;color:var(--muted)}
+
+/* price */
+.price{margin-top:64px;display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+.pcard{position:relative;border-radius:24px;padding:clamp(28px,4vw,48px);background:var(--panel);border:1px solid var(--line)}
+.pcard.main{background:linear-gradient(var(--bg2),var(--bg2)) padding-box,conic-gradient(from var(--ang,0deg),var(--orange),var(--violet),var(--cyan),var(--orange)) border-box;border:1px solid transparent;animation:ang 8s linear infinite}
+.pcard .t{font:600 12px var(--mono);letter-spacing:.25em;color:var(--cyan)}
+.pcard .t2{margin-top:10px;font-weight:700;font-size:18px}
+.pcard .yen{margin-top:20px;display:flex;align-items:baseline;gap:6px;font-family:var(--en);font-weight:700}
+.pcard .yen .pre{font-size:22px;color:var(--muted)}
+.pcard .yen .num{font-size:clamp(84px,11vw,150px);line-height:.9;letter-spacing:-.04em}
+.pcard.main .yen .num{background:linear-gradient(180deg,#fff,#ffcf9a 60%,var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pcard .yen .unit{font-size:24px}
+.pcard ul{margin-top:24px;list-style:none;display:grid;gap:10px}
+.pcard li{display:flex;gap:12px;color:var(--muted);font-size:15px}
+.pcard li::before{content:"▸";color:var(--cyan)}
+
+/* flow */
+.flow{margin-top:64px;position:relative;display:grid;gap:0}
+.flow::before{content:"";position:absolute;left:23px;top:0;bottom:0;width:1px;background:var(--line)}
+.flow .fill{position:absolute;left:23px;top:0;width:1px;height:0;background:linear-gradient(var(--cyan),var(--orange));box-shadow:0 0 12px var(--cyan)}
+.step{position:relative;display:grid;grid-template-columns:48px 1fr;gap:28px;padding:28px 0}
+.step .dot{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 14px var(--mono);background:var(--bg);border:1px solid var(--line);color:var(--muted);transition:.4s;position:relative;z-index:1}
+.step.on .dot{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 24px rgba(69,230,255,.5)}
+.step h3{font-size:clamp(20px,2.2vw,26px);font-weight:900}
+.step h3 small{margin-left:12px;font:500 12px var(--mono);color:var(--orange);letter-spacing:.1em}
+.step p{margin-top:6px;color:var(--muted);font-size:15px;max-width:640px}
+
+/* message */
+.msg{display:grid;grid-template-columns:auto 1fr;gap:clamp(24px,5vw,64px);align-items:start}
+.msg .q{font:700 clamp(80px,12vw,160px)/0.8 var(--en);color:var(--orange);opacity:.8}
+.msg blockquote{font-weight:700;font-size:clamp(20px,2.6vw,32px);line-height:1.7}
+.msg blockquote em{font-style:normal;color:var(--cyan)}
+.msg .who{margin-top:28px;font:500 14px var(--mono);color:var(--muted);letter-spacing:.08em}
+
+/* final */
+.final{text-align:center;overflow:hidden}
+.final .big{font-weight:900;font-size:clamp(44px,10vw,150px);line-height:1.05;letter-spacing:-.03em}
+.final p{margin:24px auto 0;color:var(--muted);max-width:560px}
+.final .btns{justify-content:center}
+.final .btn{padding:26px 48px;font-size:18px}
+.final::before{content:"";position:absolute;left:50%;top:50%;width:900px;height:900px;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,138,31,.16),transparent 60%);pointer-events:none}
+
+footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:40px clamp(16px,6vw,96px);display:flex;flex-wrap:wrap;gap:16px 32px;justify-content:space-between;font-size:13px;color:var(--muted)}
+footer nav{display:flex;flex-wrap:wrap;gap:8px 24px}
+footer a:hover{color:var(--cyan)}
+
+/* ===== responsive ===== */
+@media (max-width:900px){
+  .formula{grid-template-columns:1fr}
+  .op{font-size:40px;line-height:1}
+  .work,.work.big{grid-column:span 12}
+  .work.big{grid-template-columns:1fr}
+  .phones{grid-template-columns:1fr 1fr}
+  .phones .phone:last-child{grid-column:span 2;max-width:50%;justify-self:center;width:100%}
+  .metrics,.price{grid-template-columns:1fr}
+  .rings{right:-40vw;width:110vw;opacity:.45}
+  .hud.tr{display:none}
+  .prob{grid-template-columns:44px 1fr}
+  .prob .x{display:none}
+  .msg{grid-template-columns:1fr}
+  .msg .q{font-size:72px}
+}
+@media (max-width:560px){
+  .phones{grid-template-columns:1fr}
+  .phones .phone:last-child{grid-column:auto;max-width:none}
+  .phone .scr{aspect-ratio:9/12}
+  .hud.tl{display:none}
+  .btn{padding:18px 26px}
+  .tag{font-size:10px;letter-spacing:.12em}
+  .hero h1{font-size:11.5vw}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none;filter:none}
+}
+</style>
+</head>
+<body>
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="ln">INITIALIZING AI INFRASTRUCTURE</div>
+  <div class="pct" id="pct">0</div>
+  <div class="bar"><i id="pbar"></i></div>
+</div>
+<div class="noise"></div>
+<div class="glow-follow"></div>
+<div class="progress" id="progress"></div>
+<div class="cur-dot" id="cdot"></div><div class="cur-ring" id="cring"></div><div class="cur-label" id="clabel"></div>
+
+<header>
+  <a href="#top" class="logo" aria-label="まるごとAI トップへ"><span class="pulse"></span>まるごと<b>AI</b></a>
+  <a class="hcta" href="https://www.jicoo.com/t/marugoto-ai/e/rspace" target="_blank" rel="noopener" data-cursor="BOOK">無料業務診断を予約</a>
+</header>
+
+<main id="top">
+<!-- HERO -->
+<section class="hero">
+  <canvas id="net" aria-hidden="true"></canvas>
+  <div class="grid-floor" aria-hidden="true"></div>
+  <div class="rings" id="rings" aria-hidden="true">
+    <svg viewBox="0 0 400 400">
+      <defs><linearGradient id="rg" x1="0" x2="1"><stop offset="0" stop-color="#45e6ff"/><stop offset="1" stop-color="#8a6cff"/></linearGradient></defs>
+      <g class="spin"><circle cx="200" cy="200" r="190" fill="none" stroke="rgba(69,230,255,.18)" stroke-dasharray="2 6"/></g>
+      <g class="spin r"><circle cx="200" cy="200" r="160" fill="none" stroke="url(#rg)" stroke-width="1" stroke-dasharray="120 40 10 40" opacity=".7"/></g>
+      <g class="spin f"><circle cx="200" cy="200" r="128" fill="none" stroke="rgba(255,138,31,.6)" stroke-width="2" stroke-dasharray="40 260"/></g>
+      <g class="spin r"><circle cx="200" cy="200" r="100" fill="none" stroke="rgba(69,230,255,.35)" stroke-dasharray="1 4"/>
+        <text x="200" y="96" fill="rgba(69,230,255,.6)" font-family="JetBrains Mono" font-size="7" text-anchor="middle" letter-spacing="3">RABI × MINI-YASUDA</text></g>
+      <circle cx="200" cy="200" r="3" fill="#45e6ff"/>
+    </svg>
+  </div>
+  <div class="hero-in">
+    <span class="tag">AI INFRASTRUCTURE FOR EVERY COMPANY</span>
+    <h1><span class="l scramble" data-text="AIインフラを、">AIインフラを、</span><span class="l grad scramble" data-text="すべての会社に。">すべての会社に。</span></h1>
+    <p class="lead">月<em>10万円</em>で叶う、オリジナル自社システム。</p>
+    <p class="sub">営業管理・社内カレンダー・AI秘書——御社の業務にぴったり合うシステムを、AIを使ってゼロから一緒に作ります。作って終わりではなく、社内で使いこなせる担当者が育つまで伴走します。</p>
+    <div class="btns">
+      <a class="btn magnetic" href="https://www.jicoo.com/t/marugoto-ai/e/rspace" target="_blank" rel="noopener" data-cursor="BOOK">無料の業務診断を予約する <span class="arr">→</span></a>
+      <span class="btn-note">30分・オンライン可・売り込みなし</span>
+    </div>
+  </div>
+  <div class="hud tl" aria-hidden="true">SYS <b>ONLINE</b><br>CURSOR <b id="hx">0000</b> / <b id="hy">0000</b><br>NODES <b id="hn">000</b></div>
+  <div class="hud tr" aria-hidden="true">OPERATED BY<br><b>RSPACE INC.</b><br>TOKYO, JP</div>
+  <div class="scroll-ind" aria-hidden="true"></div>
+</section>
+
+<div class="marquee" aria-hidden="true"><div class="track" id="mq"></div></div>
+
+<!-- PROBLEM -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">01 / PROBLEM</div>
+    <h2 class="h2 rv d1">「AIを入れたい」のに、<br><span class="dim">前に進めない理由がある。</span></h2>
+    <div class="probs">
+      <div class="prob rv"><span class="n">ERR_01</span><span>既製品のソフトが、業務に合わない</span><span class="x">MISMATCH</span></div>
+      <div class="prob rv"><span class="n">ERR_02</span><span>システム開発の見積もりが、高すぎる</span><span class="x">OVER BUDGET</span></div>
+      <div class="prob rv"><span class="n">ERR_03</span><span>ツールを入れても、社内で使われない</span><span class="x">NOT ADOPTED</span></div>
+      <div class="prob rv"><span class="n">ERR_04</span><span>AIに詳しい人が、社内にいない</span><span class="x">NO OPERATOR</span></div>
+      <div class="prob rv"><span class="n">ERR_05</span><span>Excelと紙の管理が、もう限界</span><span class="x">OVERLOAD</span></div>
+    </div>
+    <p class="answer rv">だから、御社だけのシステムを<br><span class="hl">月10万円</span>で、使いこなせるまで一緒に作る。</p>
+  </div>
+</section>
+
+<!-- FORMULA -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">02 / CONCEPT</div>
+    <h2 class="h2 rv d1">システムと人がそろって、<br>はじめて<span class="grad">AIインフラ</span>になる。</h2>
+    <div class="formula">
+      <div class="card tilt rv"><div class="ic">SYSTEM</div><h3>rabi</h3><p>御社の業務に合わせて、AIでゼロから作る開発の仕組み。</p></div>
+      <div class="op rv d1">+</div>
+      <div class="card tilt rv d2"><div class="ic">PEOPLE</div><h3>ミニ安田</h3><p>社内でAIを使いこなし、システムを育て続ける担当者。</p></div>
+      <div class="op rv d3">=</div>
+      <div class="card result tilt rv d4"><div class="ic">INFRASTRUCTURE</div><h3>AIインフラ</h3><p>作って終わりにならない、会社の地力そのもの。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKS -->
+<section id="works">
+  <div class="wrap">
+    <div class="kicker rv">03 / WORKS</div>
+    <h2 class="h2 rv d1">これ、全部<br><span class="grad">実際に動いている。</span></h2>
+    <p class="p rv d2">下は、実際に構築・稼働しているシステムのほんの一部。これと同じ発想で、御社の「欲しい」をゼロから形にします。</p>
+
+    <div class="works">
+      <article class="work big rv">
+        <div>
+          <div class="orb-wrap" id="orbWrap" data-cursor="TALK" role="button" tabindex="0" aria-label="HAPPYを起動するデモ">
+            <canvas id="orb"></canvas>
+            <div class="orb-ui" id="orbUi">CLICK TO WAKE <b>HAPPY</b></div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="no">01 — AI PARTNER</div>
+          <h3>AIの相棒 HAPPY</h3>
+          <p>「ハッピー」と呼びかけると起動し、「ありがとう、ハッピー」で待機。つながったデータベースから必要なデータを集めて分析し、改善案まで出してくれる、映画のジャービスのような相棒です。</p>
+          <div class="say" id="say"><span class="m">// 球体をクリックすると、HAPPYが起動します（デモ）</span></div>
+          <p style="margin-top:8px;font-size:12px">※ 会話と数字は、動きを体験していただくためのデモです。</p>
+        </div>
+      </article>
+
+      <article class="work rv">
+        <div class="media tilt"><span class="live">稼働中</span><img src="img/roleplay.webp" alt="AIロープレの実際の画面。お客様役のAIと会話している" loading="lazy"><div class="scan"></div></div>
+        <div class="meta"><div class="no">02 — TRAINING</div><h3>AIロープレ</h3><p>自社の営業トークを入れて、AIのお客様を相手に声で練習。トーク通りに話せているかを、AIが判定します。</p></div>
+      </article>
+      <article class="work rv d2">
+        <div class="media tilt"><span class="live">稼働中</span><img src="img/simulator.webp" alt="太陽光と蓄電池の創蓄シミュレーターの実際の画面" loading="lazy"><div class="scan"></div></div>
+        <div class="meta"><div class="no">03 — SIMULATION</div><h3>創蓄シミュレーター</h3><p>屋根に乗るパネルの枚数、原価率と利益を、お客様の前でその場で計算。お客様と自社、両方のメリットを並べて提案できます。</p></div>
+      </article>
+
+      <div class="phones">
+        <div class="phone tilt rv"><div class="scr"><img src="img/calendar.jpg" alt="社内専用カレンダーの実際の画面" loading="lazy"></div><div class="cap"><b>社内専用カレンダー</b><span>全員の空き時間を一瞬で見つけて、そのまま予定作成。</span></div></div>
+        <div class="phone tilt rv d1"><div class="scr"><img src="img/sales.jpg" alt="営業管理システムの実際の画面" loading="lazy"></div><div class="cap"><b>営業管理システム</b><span>アポ・商談・成約・売上・勝率が一目で。AIに日本語で質問も。</span></div></div>
+        <div class="phone tilt rv d2"><div class="scr"><img src="img/secretary.jpg" alt="AI秘書が新幹線を手配している実際の画面" loading="lazy"></div><div class="cap"><b>AI秘書</b><span>「日曜16時までに名古屋」で、新幹線の候補出しから予約まで。</span></div></div>
+      </div>
+
+      <div class="next rv">
+        <b>次にここに載るのは、<em>御社の「こんなの欲しかった」</em>。</b>
+        <a href="https://www.jicoo.com/t/marugoto-ai/e/rspace" target="_blank" rel="noopener" data-cursor="BOOK">無料診断で相談する →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">04 / PROOF</div>
+    <h2 class="h2 rv d1">人に勧める前に、<br>自分たちの会社で結果を出した。</h2>
+    <p class="p rv d2">AIに詳しくなかった僕たちが、ゼロから学んで自社のメイン事業を支えるシステム（ラビシステム）を作りました。</p>
+    <div class="metrics">
+      <div class="metric rv" style="--k:.05">
+        <div class="lbl"><small>MONTHLY / ROUTE PLANNING</small>定期点検のルート選定</div>
+        <div class="row"><span class="from">5時間</span><span class="to"><span class="count" data-to="15">0</span><small>分</small></span></div>
+        <div class="bar"><i></i></div>
+        <div class="cut">−95% TIME</div>
+      </div>
+      <div class="metric rv d2" style="--k:.021">
+        <div class="lbl"><small>MONTHLY / EXPENSE CALC</small>立替経費の計算</div>
+        <div class="row"><span class="from">4時間</span><span class="to"><span class="count" data-to="5">0</span><small>分</small></span></div>
+        <div class="bar"><i></i></div>
+        <div class="cut">−98% TIME</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TERMINAL -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">05 / HOW WE BUILD</div>
+    <h2 class="h2 rv d1">御社の業務を、<br><span class="grad">その場でシステムに変える。</span></h2>
+    <div class="term rv d2">
+      <div class="bar"><i></i><i></i><i></i><span>rabi — build session</span></div>
+      <pre id="term"><span class="caret"></span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">06 / COMPARE</div>
+    <h2 class="h2 rv d1">同じシステムを頼むと、<br><span class="dim">いくらかかるか。</span></h2>
+    <div class="compare rv d2" id="compare">
+      <div class="cmp a"><div class="lbl"><span>AI導入コンサル会社（一般例）</span><span>¥10,000,000〜15,000,000</span></div><div class="track"><div class="fill"></div></div></div>
+      <div class="cmp b"><div class="lbl"><span>まるごとAI</span><span>月額 ¥100,000</span></div><div class="track"><div class="fill"></div></div></div>
+    </div>
+    <p class="note">※ AI導入コンサル会社の費用は、当社が把握している一般的な目安です。</p>
+  </div>
+</section>
+
+<!-- PRICE -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">07 / PRICE</div>
+    <h2 class="h2 rv d1">必要なものを、全部ひとつに。</h2>
+    <div class="price">
+      <div class="pcard main rv">
+        <div class="t">DEVELOP &amp; PARTNER</div>
+        <div class="t2">開発・伴走</div>
+        <div class="yen"><span class="pre">月額</span><span class="num">10</span><span class="unit">万円</span></div>
+        <ul>
+          <li>業務の分解と、御社専用システムの設計・開発</li>
+          <li>実際の業務で運用しながら、何度でも一緒に直す</li>
+          <li>社内でAIを使いこなす担当者（ミニ安田）の育成</li>
+        </ul>
+      </div>
+      <div class="pcard rv d2">
+        <div class="t">MAINTENANCE</div>
+        <div class="t2">保守・点検・相談</div>
+        <div class="yen"><span class="pre">月額</span><span class="num" style="font-size:clamp(64px,8vw,104px)">1</span><span class="unit">万円</span></div>
+        <ul>
+          <li>システム完成の翌月から</li>
+          <li>毎月の点検と、困ったときの相談</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">08 / FLOW</div>
+    <h2 class="h2 rv d1">作って終わりに、しない。</h2>
+    <div class="flow" id="flow">
+      <div class="fill" id="flowFill"></div>
+      <div class="step"><div class="dot">01</div><div><h3>無料業務診断<small>30 MIN</small></h3><p>今の業務を伺い、「システムで楽になる業務／人に残す業務」をその場で仕分けます。</p></div></div>
+      <div class="step"><div class="dot">02</div><div><h3>業務設計・開発<small>2–4 WEEKS</small></h3><p>御社専用のシステムを構築。最終確認の役割分担（誰が・月に何回見るか）もここで決めます。</p></div></div>
+      <div class="step"><div class="dot">03</div><div><h3>運用しながら改善<small>ITERATE</small></h3><p>実際の業務で動かしながらテストと調整を重ね、「ここを直したい」をその場で反映します。</p></div></div>
+      <div class="step"><div class="dot">04</div><div><h3>担当者育成・保守<small>GROW</small></h3><p>社内でAIを使いこなせる担当者を育てながら、御社仕様に育て続けます。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MESSAGE -->
+<section>
+  <div class="wrap msg">
+    <div class="q rv" aria-hidden="true">“</div>
+    <div>
+      <blockquote class="rv d1">私はもともとエンジニアではありません。ゼロからAIを学び、自社のシステムを自分たちの手で作ってきました。<br>だからこそ言えます。<em>AIは、一部の大企業だけの武器じゃない。</em></blockquote>
+      <div class="who rv d2">株式会社アールスペース 代表取締役 安田 海斗</div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL -->
+<section class="final" id="contact">
+  <div class="wrap">
+    <div class="kicker rv" style="justify-content:center">09 / START</div>
+    <h2 class="big rv d1">まずは、<span class="grad">30分。</span></h2>
+    <p class="rv d2">「どの業務を・どんなシステムで楽にできるか」をその場でお答えします。診断は無料です。合わなければ、それも正直にお伝えします。</p>
+    <div class="btns rv d3">
+      <a class="btn magnetic" href="https://www.jicoo.com/t/marugoto-ai/e/rspace" target="_blank" rel="noopener" data-cursor="BOOK">無料の業務診断を予約する <span class="arr">→</span></a>
+    </div>
+    <p class="btn-note rv d4" style="margin-top:18px">30分・オンライン可・売り込みなし</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div>© 株式会社アールスペース ／ まるごとAI</div>
+  <nav>
+    <a href="../">通常版のページ</a>
+    <a href="../#tokushoho">特定商取引法に基づく表記</a>
+    <a href="../#privacy">プライバシーポリシー</a>
+    <a href="mailto:yasuda@rspace.biz">yasuda@rspace.biz</a>
+  </nav>
+</footer>
+
+<script>
+(() => {
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const root = document.documentElement;
+let mx = innerWidth / 2, my = innerHeight / 2;
+
+/* ---------- loader ---------- */
+const loader = $('#loader'), pct = $('#pct'), pbar = $('#pbar');
+let lp = 0; const t0 = performance.now();
+function load(t) {
+  lp = Math.min(100, ((t - t0) / (reduce ? 200 : 1100)) * 100);
+  pct.textContent = Math.floor(lp); pbar.style.transform = `scaleX(${lp / 100})`;
+  if (lp < 100) requestAnimationFrame(load); else { loader.classList.add('done'); start(); }
+}
+requestAnimationFrame(load);
+
+/* ---------- scramble text ---------- */
+const glyphs = 'アイウエオカキクケコサシスセソ01ABCDEFXYZ#$%&<>/\\';
+function scramble(el, delay) {
+  const txt = el.dataset.text; if (reduce) return;
+  let f = 0; const total = txt.length * 3 + 18;
+  setTimeout(function tick() {
+    let out = '';
+    for (let i = 0; i < txt.length; i++) {
+      out += f > i * 3 + 12 ? txt[i] : (f > i * 3 ? glyphs[Math.random() * glyphs.length | 0] : ' ');
+    }
+    el.textContent = out;
+    if (++f <= total) requestAnimationFrame(tick); else el.textContent = txt;
+  }, delay);
+}
+function start() { $$('.scramble').forEach((el, i) => scramble(el, i * 280)); }
+$$('.scramble').forEach(el => { if (!reduce) el.textContent = ' '; });
+
+/* ---------- cursor ---------- */
+const cdot = $('#cdot'), cring = $('#cring'), clabel = $('#clabel');
+let rx = mx, ry = my;
+if (fine && !reduce) document.body.classList.add('has-cursor');
+addEventListener('pointermove', e => {
+  mx = e.clientX; my = e.clientY;
+  root.style.setProperty('--mx', mx + 'px'); root.style.setProperty('--my', my + 'px');
+  cdot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+  clabel.style.transform = `translate(${mx + 24}px,${my + 18}px)`;
+  hx.textContent = String(mx | 0).padStart(4, '0'); hy.textContent = String(my | 0).padStart(4, '0');
+}, { passive: true });
+const hx = $('#hx'), hy = $('#hy'), hn = $('#hn');
+(function ring() {
+  rx += (mx - rx) * .18; ry += (my - ry) * .18;
+  cring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+  requestAnimationFrame(ring);
+})();
+$$('a,button,[data-cursor],.tilt').forEach(el => {
+  el.addEventListener('pointerenter', () => { cring.classList.add('hover'); if (el.dataset.cursor) { clabel.textContent = el.dataset.cursor; clabel.style.opacity = 1; } });
+  el.addEventListener('pointerleave', () => { cring.classList.remove('hover'); clabel.style.opacity = 0; });
+});
+
+/* ---------- magnetic buttons ---------- */
+if (fine && !reduce) $$('.magnetic').forEach(b => {
+  b.addEventListener('pointermove', e => {
+    const r = b.getBoundingClientRect();
+    b.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * .3}px,${(e.clientY - r.top - r.height / 2) * .4}px)`;
+  });
+  b.addEventListener('pointerleave', () => { b.style.transition = 'transform .5s cubic-bezier(.2,.7,.2,1)'; b.style.transform = ''; setTimeout(() => b.style.transition = '', 500); });
+});
+
+/* ---------- tilt + spotlight ---------- */
+if (fine && !reduce) $$('.tilt').forEach(c => {
+  c.addEventListener('pointermove', e => {
+    const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    c.style.transform = `perspective(900px) rotateX(${(.5 - y) * 10}deg) rotateY(${(x - .5) * 12}deg) translateZ(0)`;
+    c.style.setProperty('--cx', x * 100 + '%'); c.style.setProperty('--cy', y * 100 + '%');
+  });
+  c.addEventListener('pointerleave', () => { c.style.transform = ''; });
+});
+
+/* ---------- hero rings parallax ---------- */
+const rings = $('#rings');
+if (!reduce) (function par() {
+  const dx = (mx / innerWidth - .5), dy = (my / innerHeight - .5);
+  rings.style.transform = `translateY(-50%) translate(${dx * -40}px,${dy * -40}px) rotateX(${dy * 20}deg) rotateY(${dx * -20}deg)`;
+  requestAnimationFrame(par);
+})();
+
+/* ---------- marquee ---------- */
+const words = ['営業管理', 'AI秘書', '社内カレンダー', 'AIロープレ', 'シミュレーター', 'HAPPY', '日報の自動集計', '見積・請求', '顧客管理', 'ルート最適化'];
+const mq = $('#mq'); const half = words.map(w => `<span>${w}</span>`).join('');
+mq.innerHTML = half + half;
+
+/* ---------- neural network canvas ---------- */
+const cv = $('#net'), cx = cv.getContext('2d');
+let W, H, DPR, nodes = [], heroVisible = true;
+function size() {
+  DPR = Math.min(devicePixelRatio || 1, 2); W = cv.offsetWidth; H = cv.offsetHeight;
+  cv.width = W * DPR; cv.height = H * DPR; cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const n = Math.round(Math.min(140, (W * H) / 11000));
+  nodes = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35, r: Math.random() * 1.6 + .6, hot: Math.random() < .08 }));
+  hn.textContent = String(n).padStart(3, '0');
+}
+size(); addEventListener('resize', size);
+new IntersectionObserver(([e]) => heroVisible = e.isIntersecting).observe(cv);
+const pulses = [];
+function draw() {
+  requestAnimationFrame(draw);
+  if (!heroVisible) return;
+  cx.clearRect(0, 0, W, H);
+  const rect = cv.getBoundingClientRect(), px = mx - rect.left, py = my - rect.top;
+  for (const p of nodes) {
+    if (!reduce) { p.x += p.vx; p.y += p.vy; }
+    if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1;
+    const dx = p.x - px, dy = p.y - py, d = Math.hypot(dx, dy);
+    if (d < 180 && d > 0) { const f = (180 - d) / 180; p.x += dx / d * f * 2.2; p.y += dy / d * f * 2.2; }
+  }
+  const L = 130;
+  for (let i = 0; i < nodes.length; i++) {
+    const a = nodes[i];
+    for (let j = i + 1; j < nodes.length; j++) {
+      const b = nodes[j], d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (d < L) { cx.strokeStyle = `rgba(69,230,255,${(1 - d / L) * .28})`; cx.lineWidth = 1; cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke(); }
+    }
+    const dm = Math.hypot(a.x - px, a.y - py);
+    if (dm < 260) { cx.strokeStyle = `rgba(255,138,31,${(1 - dm / 260) * .55})`; cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(px, py); cx.stroke(); }
+  }
+  for (const p of nodes) {
+    cx.fillStyle = p.hot ? '#ff8a1f' : 'rgba(200,240,255,.9)';
+    cx.shadowColor = p.hot ? '#ff8a1f' : '#45e6ff'; cx.shadowBlur = p.hot ? 12 : 6;
+    cx.beginPath(); cx.arc(p.x, p.y, p.hot ? p.r + 1.2 : p.r, 0, 7); cx.fill();
+  }
+  cx.shadowBlur = 0;
+  if (!reduce && Math.random() < .06) { const a = nodes[Math.random() * nodes.length | 0], b = nodes[Math.random() * nodes.length | 0]; if (Math.hypot(a.x - b.x, a.y - b.y) < L * 1.4) pulses.push({ a, b, t: 0 }); }
+  for (let i = pulses.length - 1; i >= 0; i--) {
+    const s = pulses[i]; s.t += .03; if (s.t >= 1) { pulses.splice(i, 1); continue; }
+    const x = s.a.x + (s.b.x - s.a.x) * s.t, y = s.a.y + (s.b.y - s.a.y) * s.t;
+    cx.fillStyle = '#fff'; cx.shadowColor = '#45e6ff'; cx.shadowBlur = 14; cx.beginPath(); cx.arc(x, y, 1.8, 0, 7); cx.fill(); cx.shadowBlur = 0;
+  }
+}
+draw();
+
+/* ---------- HAPPY orb ---------- */
+const oc = $('#orb'), ox = oc.getContext('2d'), orbWrap = $('#orbWrap'), orbUi = $('#orbUi'), say = $('#say');
+let OW, ODPR, active = 0, activeT = 0, orbVisible = false, talk = 0;
+function osize() { ODPR = Math.min(devicePixelRatio || 1, 2); OW = oc.offsetWidth; oc.width = oc.height = OW * ODPR; ox.setTransform(ODPR, 0, 0, ODPR, 0, 0); }
+osize(); addEventListener('resize', osize);
+new IntersectionObserver(([e]) => orbVisible = e.isIntersecting).observe(oc);
+const pts = Array.from({ length: 420 }, (_, i) => { const y = 1 - (i / 419) * 2, r = Math.sqrt(1 - y * y), th = i * 2.39996; return [Math.cos(th) * r, y, Math.sin(th) * r]; });
+let rotY = 0, rotX = 0;
+function orb(t) {
+  requestAnimationFrame(orb); if (!orbVisible) return;
+  activeT += ((active ? 1 : 0) - activeT) * .06;
+  ox.clearRect(0, 0, OW, OW);
+  const c = OW / 2, rect = oc.getBoundingClientRect();
+  const tx = ((mx - rect.left) / rect.width - .5), ty = ((my - rect.top) / rect.height - .5);
+  rotY += reduce ? 0 : .004 + activeT * .01; rotX += ((ty * .8) - rotX) * .05;
+  const ry = rotY + tx * .8;
+  const R = OW * (.28 + activeT * .04 + (talk ? Math.sin(t / 70) * .012 : 0));
+  const g = ox.createRadialGradient(c, c, 0, c, c, R * 1.9);
+  g.addColorStop(0, `rgba(69,230,255,${.22 + activeT * .25})`); g.addColorStop(.5, `rgba(138,108,255,${.08 + activeT * .1})`); g.addColorStop(1, 'transparent');
+  ox.fillStyle = g; ox.fillRect(0, 0, OW, OW);
+  const cy = Math.cos(ry), sy = Math.sin(ry), cxr = Math.cos(rotX), sxr = Math.sin(rotX);
+  for (const [x0, y0, z0] of pts) {
+    const wob = 1 + (talk ? Math.sin(t / 90 + y0 * 6) * .05 : Math.sin(t / 900 + y0 * 4) * .015);
+    let x = x0 * cy - z0 * sy, z = x0 * sy + z0 * cy, y = y0 * cxr - z * sxr; z = y0 * sxr + z * cxr;
+    const s = (z + 2.2) / 3.2, X = c + x * R * wob, Y = c + y * R * wob;
+    ox.fillStyle = z > 0 ? `rgba(${170 + activeT * 85 | 0},${235 - activeT * 90 | 0},${255 - activeT * 200 | 0},${.25 + s * .7})` : `rgba(69,230,255,${s * .25})`;
+    ox.beginPath(); ox.arc(X, Y, .6 + s * 1.5, 0, 7); ox.fill();
+  }
+  ox.strokeStyle = `rgba(69,230,255,${.25 + activeT * .4})`; ox.lineWidth = 1;
+  for (let k = 0; k < 3; k++) { ox.beginPath(); ox.arc(c, c, R * (1.25 + k * .18) + (talk ? Math.sin(t / 120 + k) * 4 : 0), t / (1400 - k * 300) + k, t / (1400 - k * 300) + k + 1.6 + activeT * 2); ox.stroke(); }
+}
+requestAnimationFrame(orb);
+const script = [
+  ['u', 'ハッピー'], ['a', '起動しました。何をお手伝いしましょう？'],
+  ['u', '今月の成約率、先月と比べてどう？'], ['a', 'データベースを確認中…… 先月より4.2pt上がっています。伸びたのは午後のアポです。来月は午後枠を2割増やすのがおすすめです。'],
+  ['u', 'ありがとう、ハッピー'], ['a', '待機します。']
+];
+let running = false;
+async function typeLine(cls, text) {
+  const span = document.createElement('div'); span.className = cls; say.appendChild(span);
+  const pre = cls === 'u' ? '> ' : 'HAPPY: ';
+  for (let i = 0; i <= text.length; i++) { span.textContent = pre + text.slice(0, i); await new Promise(r => setTimeout(r, reduce ? 0 : 28)); }
+  await new Promise(r => setTimeout(r, 500));
+}
+async function wake() {
+  if (running) return; running = true; say.innerHTML = '';
+  for (const [who, line] of script) {
+    if (who === 'u' && line === 'ハッピー') { active = 1; orbUi.innerHTML = '<b>LISTENING…</b>'; }
+    talk = who === 'a' ? 1 : 0; if (who === 'a') orbUi.innerHTML = '<b>ANALYZING…</b>';
+    await typeLine(who, line);
+  }
+  talk = 0; active = 0; orbUi.innerHTML = 'CLICK TO WAKE <b>HAPPY</b>'; running = false;
+}
+orbWrap.addEventListener('click', wake);
+orbWrap.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); wake(); } });
+
+/* ---------- reveal + counters ---------- */
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return; e.target.classList.add('in'); io.unobserve(e.target);
+  $$('.count', e.target).forEach(countUp);
+  if (e.target.id === 'compare') e.target.classList.add('in');
+}), { threshold: .18, rootMargin: '0px 0px -8% 0px' });
+$$('.rv').forEach(el => io.observe(el));
+function countUp(el) {
+  const to = +el.dataset.to, from = 240, t0 = performance.now(), dur = reduce ? 1 : 1800;
+  (function f(t) { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 4); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(f); })(t0);
+}
+
+/* ---------- terminal ---------- */
+const term = $('#term');
+const lines = [
+  ['m', '$ rabi start --client "御社"'],
+  ['c', '▸ 業務ヒアリングを読み込み中…'],
+  ['', '  毎月の作業: 点検ルート選定 / 経費計算 / 日報集計 / 顧客対応'],
+  ['o', '▸ 仕分け: システムで楽になる業務 3件 ／ 人に残す業務 1件'],
+  ['c', '▸ 設計: 画面 6 / データベース 4 / AIの判断ルール 12'],
+  ['c', '▸ rabi で開発中 ████████████████████ 100%'],
+  ['g', '✔ テスト通過。御社の実際の業務で試運転を開始'],
+  ['o', '▸ 改善リクエスト: 「この画面、もっと大きく」 → 反映済み'],
+  ['g', '✔ 社内担当者（ミニ安田）が操作を習得'],
+  ['g', '✔ AIインフラ、稼働中。'],
+];
+let termDone = false;
+new IntersectionObserver(async ([e], obs) => {
+  if (!e.isIntersecting || termDone) return; termDone = true; obs.disconnect();
+  term.innerHTML = '';
+  for (const [cls, text] of lines) {
+    const s = document.createElement('span'); if (cls) s.className = cls; term.appendChild(s);
+    const caret = document.createElement('span'); caret.className = 'caret'; term.appendChild(caret);
+    for (let i = 0; i <= text.length; i++) { s.textContent = text.slice(0, i); await new Promise(r => setTimeout(r, reduce ? 0 : 16)); }
+    caret.remove(); term.appendChild(document.createTextNode('\n'));
+    await new Promise(r => setTimeout(r, reduce ? 0 : 260));
+  }
+  const c = document.createElement('span'); c.className = 'caret'; term.appendChild(c);
+}, { threshold: .4 }).observe(term);
+
+/* ---------- scroll progress + flow line ---------- */
+const prog = $('#progress'), flow = $('#flow'), ff = $('#flowFill'), steps = $$('.step');
+function onScroll() {
+  const h = document.documentElement.scrollHeight - innerHeight;
+  prog.style.transform = `scaleX(${h > 0 ? scrollY / h : 0})`;
+  const r = flow.getBoundingClientRect(), k = Math.max(0, Math.min(1, (innerHeight * .6 - r.top) / r.height));
+  ff.style.height = k * r.height + 'px';
+  steps.forEach(s => { const sr = s.getBoundingClientRect(); s.classList.toggle('on', sr.top + 24 < innerHeight * .6); });
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+})();
+</script>
+</body>
+</html>

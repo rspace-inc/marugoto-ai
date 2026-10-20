@@ -233,16 +233,28 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
   88%{transform:scaleX(.12)}
   100%{transform:scaleX(.09);background:linear-gradient(90deg,#ff8a1f,#ffc078);box-shadow:0 0 36px rgba(255,138,31,.7)}
 }
-.cmp .arw{position:absolute;top:50%;z-index:2;font-size:30px;line-height:1;color:var(--cyan);text-shadow:0 0 14px var(--cyan);opacity:0;transform:translateY(-50%)}
+.cmp .arw{position:absolute;top:50%;z-index:2;font-size:40px;line-height:1;color:var(--cyan);text-shadow:0 0 18px var(--cyan);opacity:0;transform:translateY(-50%)}
+.cmp .arw i{display:inline-block}
+.compare.in .cmp .arw.l i{animation:nudgeL 1s 2.6s ease-in-out infinite}
+.compare.in .cmp .arw.r i{animation:nudgeR 1s 2.6s ease-in-out infinite}
+@keyframes nudgeL{50%{transform:translateX(8px)}}
+@keyframes nudgeR{50%{transform:translateX(-8px)}}
+.cmp .trail{position:absolute;top:50%;height:2px;margin-top:-1px;z-index:1;opacity:0;pointer-events:none}
+.cmp .trail.l{left:0;background:linear-gradient(90deg,transparent,rgba(69,230,255,.8))}
+.cmp .trail.r{right:0;background:linear-gradient(270deg,transparent,rgba(69,230,255,.8))}
+.compare.in .cmp .trail{animation:trail 2.6s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes trail{0%,45%{opacity:0;width:0}50%{opacity:1;width:0}78%{opacity:1;width:calc(47.5% - 44px)}100%{opacity:.7;width:calc(45.5% - 44px)}}
 .cmp .arw.l{left:-4px}.cmp .arw.r{right:-4px}
 .compare.in .cmp .arw.l{animation:pushL 2.6s cubic-bezier(.2,.7,.2,1) forwards}
 .compare.in .cmp .arw.r{animation:pushR 2.6s cubic-bezier(.2,.7,.2,1) forwards}
-@keyframes pushL{0%,42%{opacity:0;left:-4px}50%{opacity:1;left:-4px}78%{opacity:1;left:calc(47.5% - 30px)}88%{left:calc(44% - 30px)}100%{opacity:0;left:calc(45.5% - 30px)}}
-@keyframes pushR{0%,42%{opacity:0;right:-4px}50%{opacity:1;right:-4px}78%{opacity:1;right:calc(47.5% - 30px)}88%{right:calc(44% - 30px)}100%{opacity:0;right:calc(45.5% - 30px)}}
+@keyframes pushL{0%,42%{opacity:0;left:0}50%{opacity:1;left:0}78%{opacity:1;left:calc(47.5% - 44px)}88%{left:calc(43.5% - 44px)}100%{opacity:1;left:calc(45.5% - 44px)}}
+@keyframes pushR{0%,42%{opacity:0;right:0}50%{opacity:1;right:0}78%{opacity:1;right:calc(47.5% - 44px)}88%{right:calc(43.5% - 44px)}100%{opacity:1;right:calc(45.5% - 44px)}}
 .compare.in .cmp.b .track{animation:jolt .35s 2.05s}
 @keyframes jolt{25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
 .sq{margin-top:22px;text-align:center}
-.sq .from{font-weight:700;font-size:clamp(16px,1.8vw,20px);color:var(--muted)}
+.sq .from{display:inline-flex;align-items:center;gap:14px;font-weight:700;font-size:clamp(16px,1.8vw,22px);color:var(--muted)}
+.sq .old{text-decoration-color:var(--red);text-decoration-thickness:3px}
+.sq .down{color:var(--cyan);font-size:1.5em;text-shadow:0 0 14px var(--cyan)}
 .sq .num{display:block;margin-top:4px;font-weight:900;font-size:clamp(56px,10vw,128px);line-height:1.05;letter-spacing:-.03em;color:var(--text);transition:color .4s,text-shadow .4s}
 .sq .num.done{color:var(--orange);text-shadow:0 0 50px rgba(255,138,31,.55)}
 .sq .num small{font-size:.4em;margin-left:4px}
@@ -518,8 +530,8 @@ footer a:hover{color:var(--cyan)}
     <h2 class="h2 rv d1">同じシステムを頼むと、<br><span class="dim">いくらかかるか。</span></h2>
     <div class="compare rv d2" id="compare">
       <div class="cmp a"><div class="lbl"><span>AI導入コンサル会社（一般例）</span><span class="amt">1,000万〜1,500万<small>円</small></span></div><div class="track"><div class="fill"></div></div></div>
-      <div class="cmp b"><div class="lbl"><span>まるごとAI</span><span class="amt" style="color:var(--orange)">月10万<small>円</small></span></div><div class="track"><i class="arw l" aria-hidden="true">▶</i><div class="fill"></div><i class="arw r" aria-hidden="true">◀</i></div></div>
-      <div class="sq" aria-hidden="true"><span class="from">1,500万円が、ギュッと</span><span class="num" id="sqNum"><span class="pre">月</span><span id="sqVal">1,500</span>万<small>円</small></span></div>
+      <div class="cmp b"><div class="lbl"><span>まるごとAI</span><span class="amt" style="color:var(--orange)">月10万<small>円</small></span></div><div class="track"><span class="trail l" aria-hidden="true"></span><span class="arw l" aria-hidden="true"><i>▶</i></span><div class="fill"></div><span class="arw r" aria-hidden="true"><i>◀</i></span><span class="trail r" aria-hidden="true"></span></div></div>
+      <div class="sq" aria-hidden="true"><span class="from"><s class="old">1,000万〜1,500万円</s><b class="down">➜</b>ギュッと</span><span class="num" id="sqNum"><span class="pre">月</span><span id="sqVal">1,500</span>万<small>円</small></span></div>
     </div>
     <p class="note">※ AI導入コンサル会社の費用は、当社が把握している一般的な目安です。</p>
   </div>

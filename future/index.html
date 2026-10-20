@@ -446,7 +446,7 @@ footer a:hover{color:var(--cyan)}
   <div class="wrap">
     <div class="kicker rv">04 / PROOF</div>
     <h2 class="h2 rv d1">人に勧める前に、<br>自分たちの会社で結果を出した。</h2>
-    <p class="p rv d2">AIに詳しくなかった僕たちが、ゼロから学んで自社のメイン事業を支えるシステム（ラビシステム）を作りました。</p>
+    <p class="p rv d2">AIに詳しくなかった僕たちが、ゼロから学んで自社のメイン事業を支えるシステム（ラビシステム）やAI秘書を作り、毎日の仕事を変えました。</p>
     <div class="metrics">
       <div class="metric rv" style="--k:.05">
         <div class="lbl"><small>MONTHLY / ROUTE PLANNING</small>定期点検のルート選定</div>
@@ -459,6 +459,18 @@ footer a:hover{color:var(--cyan)}
         <div class="row"><span class="from">4時間</span><span class="to"><span class="count" data-to="5">0</span><small>分</small></span></div>
         <div class="bar"><i></i></div>
         <div class="cut">−98% TIME</div>
+      </div>
+      <div class="metric rv" style="--k:.01">
+        <div class="lbl"><small>EVERY TRIP / TICKET</small>新幹線のきっぷ発券</div>
+        <div class="row"><span class="from">約5分</span><span class="to"><span class="count" data-from="5" data-to="0">0</span><small>分</small></span></div>
+        <div class="bar"><i></i></div>
+        <div class="cut">改札前の行列なし。AI秘書が自動で手配</div>
+      </div>
+      <div class="metric rv d2" style="--k:.01">
+        <div class="lbl"><small>MONTHLY / ACCOUNTING MEETING</small>売上・支払いの集計のための<br>税理士との月次打ち合わせ</div>
+        <div class="row"><span class="from">毎月</span><span class="to"><span class="count" data-from="1" data-to="0">0</span><small>回</small></span></div>
+        <div class="bar"><i></i></div>
+        <div class="cut">集計は自動に。打ち合わせが不要に</div>
       </div>
     </div>
   </div>
@@ -774,7 +786,7 @@ const io = new IntersectionObserver(es => es.forEach(e => {
 }), { threshold: .18, rootMargin: '0px 0px -8% 0px' });
 $$('.rv').forEach(el => io.observe(el));
 function countUp(el) {
-  const to = +el.dataset.to, from = 240, t0 = performance.now(), dur = reduce ? 1 : 1800;
+  const to = +el.dataset.to, from = el.dataset.from ? +el.dataset.from : 240, t0 = performance.now(), dur = reduce ? 1 : 1800;
   (function f(t) { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 4); el.textContent = Math.round(from + (to - from) * e); if (k < 1) requestAnimationFrame(f); })(t0);
 }
 

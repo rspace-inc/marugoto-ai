@@ -215,16 +215,39 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
 .caret{display:inline-block;width:8px;height:1.1em;background:var(--cyan);vertical-align:-3px;animation:pulse 1s steps(1) infinite}
 
 /* compare */
-.compare{margin-top:64px;display:grid;gap:28px}
-.cmp .lbl{display:flex;justify-content:space-between;gap:12px;font-weight:700;font-size:clamp(15px,1.6vw,18px);flex-wrap:wrap}
-.cmp .lbl span:last-child{font-family:var(--en)}
-.cmp .track{margin-top:12px;height:56px;border-radius:12px;background:rgba(255,255,255,.04);overflow:hidden;border:1px solid var(--line)}
-.cmp .fill{height:100%;transform-origin:0;transform:scaleX(0);transition:transform 1.8s cubic-bezier(.2,.7,.2,1)}
-.cmp.a .fill{background:repeating-linear-gradient(45deg,#2a3350 0 10px,#222a44 10px 20px)}
-.cmp.b .fill{background:linear-gradient(90deg,var(--orange),#ffc078);box-shadow:0 0 30px rgba(255,138,31,.6)}
+.compare{margin-top:64px;display:grid;gap:36px}
+.cmp .lbl{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-weight:700;font-size:clamp(15px,1.6vw,18px);flex-wrap:wrap}
+.cmp .amt{font-weight:900;font-size:clamp(24px,3.2vw,40px);letter-spacing:-.01em}
+.cmp .amt small{font-size:.55em;margin-left:2px}
+.cmp .track{position:relative;margin-top:14px;height:64px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.cmp .fill{position:absolute;inset:0;border-radius:inherit;transform:scaleX(0)}
+.cmp.a .fill{transform-origin:0 50%;background:repeating-linear-gradient(45deg,#2a3350 0 10px,#222a44 10px 20px);transition:transform 1.1s cubic-bezier(.2,.7,.2,1)}
 .compare.in .cmp.a .fill{transform:scaleX(1)}
-.compare.in .cmp.b .fill{transform:scaleX(.09)}
-.cmp.b .lbl span:last-child{color:var(--orange)}
+.cmp.b .fill{transform-origin:50% 50%;background:repeating-linear-gradient(45deg,#2a3350 0 10px,#222a44 10px 20px)}
+.compare.in .cmp.b .fill{animation:squeeze 2.6s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes squeeze{
+  0%{transform:scaleX(0)}
+  35%{transform:scaleX(1);background:repeating-linear-gradient(45deg,#2a3350 0 10px,#222a44 10px 20px);box-shadow:none}
+  50%{transform:scaleX(1)}
+  78%{transform:scaleX(.05);background:linear-gradient(90deg,#ff8a1f,#ffc078);box-shadow:0 0 50px rgba(255,138,31,.9)}
+  88%{transform:scaleX(.12)}
+  100%{transform:scaleX(.09);background:linear-gradient(90deg,#ff8a1f,#ffc078);box-shadow:0 0 36px rgba(255,138,31,.7)}
+}
+.cmp .arw{position:absolute;top:50%;z-index:2;font-size:30px;line-height:1;color:var(--cyan);text-shadow:0 0 14px var(--cyan);opacity:0;transform:translateY(-50%)}
+.cmp .arw.l{left:-4px}.cmp .arw.r{right:-4px}
+.compare.in .cmp .arw.l{animation:pushL 2.6s cubic-bezier(.2,.7,.2,1) forwards}
+.compare.in .cmp .arw.r{animation:pushR 2.6s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes pushL{0%,42%{opacity:0;left:-4px}50%{opacity:1;left:-4px}78%{opacity:1;left:calc(47.5% - 30px)}88%{left:calc(44% - 30px)}100%{opacity:0;left:calc(45.5% - 30px)}}
+@keyframes pushR{0%,42%{opacity:0;right:-4px}50%{opacity:1;right:-4px}78%{opacity:1;right:calc(47.5% - 30px)}88%{right:calc(44% - 30px)}100%{opacity:0;right:calc(45.5% - 30px)}}
+.compare.in .cmp.b .track{animation:jolt .35s 2.05s}
+@keyframes jolt{25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.sq{margin-top:22px;text-align:center}
+.sq .from{font-weight:700;font-size:clamp(16px,1.8vw,20px);color:var(--muted)}
+.sq .num{display:block;margin-top:4px;font-weight:900;font-size:clamp(56px,10vw,128px);line-height:1.05;letter-spacing:-.03em;color:var(--text);transition:color .4s,text-shadow .4s}
+.sq .num.done{color:var(--orange);text-shadow:0 0 50px rgba(255,138,31,.55)}
+.sq .num small{font-size:.4em;margin-left:4px}
+.sq .num .pre{font-size:.42em;margin-right:6px;opacity:0;transition:opacity .4s}
+.sq .num.done .pre{opacity:1}
 .note{margin-top:20px;font-size:12px;color:var(--muted)}
 
 /* price */
@@ -494,8 +517,9 @@ footer a:hover{color:var(--cyan)}
     <div class="kicker rv">06 / COMPARE</div>
     <h2 class="h2 rv d1">同じシステムを頼むと、<br><span class="dim">いくらかかるか。</span></h2>
     <div class="compare rv d2" id="compare">
-      <div class="cmp a"><div class="lbl"><span>AI導入コンサル会社（一般例）</span><span>¥10,000,000〜15,000,000</span></div><div class="track"><div class="fill"></div></div></div>
-      <div class="cmp b"><div class="lbl"><span>まるごとAI</span><span>月額 ¥100,000</span></div><div class="track"><div class="fill"></div></div></div>
+      <div class="cmp a"><div class="lbl"><span>AI導入コンサル会社（一般例）</span><span class="amt">1,000万〜1,500万<small>円</small></span></div><div class="track"><div class="fill"></div></div></div>
+      <div class="cmp b"><div class="lbl"><span>まるごとAI</span><span class="amt" style="color:var(--orange)">月10万<small>円</small></span></div><div class="track"><i class="arw l" aria-hidden="true">▶</i><div class="fill"></div><i class="arw r" aria-hidden="true">◀</i></div></div>
+      <div class="sq" aria-hidden="true"><span class="from">1,500万円が、ギュッと</span><span class="num" id="sqNum"><span class="pre">月</span><span id="sqVal">1,500</span>万<small>円</small></span></div>
     </div>
     <p class="note">※ AI導入コンサル会社の費用は、当社が把握している一般的な目安です。</p>
   </div>
@@ -778,11 +802,21 @@ orbWrap.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' 
 const vio = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting && !reduce) v.play().catch(() => {}); else v.pause(); }), { threshold: .2 });
 $$('.reel video').forEach(v => { if (reduce) v.removeAttribute('autoplay'); vio.observe(v); });
 
+/* ---------- compare squeeze counter ---------- */
+function squeezeCount() {
+  const v = $('#sqVal'), n = $('#sqNum'), t0 = performance.now() + (reduce ? 0 : 1300), dur = reduce ? 1 : 750;
+  (function f(t) {
+    const k = Math.max(0, Math.min(1, (t - t0) / dur)), e = k * k;
+    v.textContent = Math.round(1500 + (10 - 1500) * e).toLocaleString('ja-JP');
+    if (k < 1) requestAnimationFrame(f); else n.classList.add('done');
+  })(performance.now());
+}
+
 /* ---------- reveal + counters ---------- */
 const io = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return; e.target.classList.add('in'); io.unobserve(e.target);
   $$('.count', e.target).forEach(countUp);
-  if (e.target.id === 'compare') e.target.classList.add('in');
+  if (e.target.id === 'compare') squeezeCount();
 }), { threshold: .18, rootMargin: '0px 0px -8% 0px' });
 $$('.rv').forEach(el => io.observe(el));
 function countUp(el) {

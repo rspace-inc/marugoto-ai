@@ -26,6 +26,10 @@
 html{scroll-behavior:smooth;background:var(--bg)}
 body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;line-height:1.8;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
+/* 日本語を文節の切れ目（<wbr>）でだけ折り返す。<wbr> は下の phrase() が入れる */
+.ph main{word-break:keep-all;overflow-wrap:anywhere}
+.ph main pre,.ph main .say{word-break:normal}
+.nw{white-space:nowrap}
 img{display:block;max-width:100%}
 ::selection{background:var(--cyan);color:#000}
 
@@ -144,7 +148,12 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
 /* works */
 .works{margin-top:64px;display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
 .work{grid-column:span 6;display:flex;flex-direction:column}
-.work.big{grid-column:span 12;display:grid;grid-template-columns:1.25fr 1fr;gap:32px;align-items:center}
+.work.big{grid-column:span 12;display:grid;grid-template-columns:1.25fr 1fr;column-gap:32px}
+/* 見出し→画像→本文。横並びのときは画像を左、見出しと本文を右の中央に寄せる */
+.work.big,.reel,.est{grid-template-rows:1fr auto auto 1fr;grid-template-areas:"m ." "m h" "m b" "m ."}
+.whead{grid-area:h}.wmedia{grid-area:m;align-self:center}.wbody{grid-area:b}
+.work .whead{padding:0 4px}.work .wbody{padding:0 4px}
+.work:not(.big) .media{margin-top:14px}.work:not(.big) .wbody{margin-top:4px}
 .work .media{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:16/10}
 .work .media img,.work .media video{width:100%;height:100%;object-fit:cover;object-position:top;transition:transform .8s cubic-bezier(.2,.7,.2,1)}
 .work:hover .media img{transform:scale(1.04)}
@@ -153,7 +162,6 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
 @keyframes scan{from{top:-30%}to{top:100%}}
 .media .live{position:absolute;left:14px;top:14px;z-index:2;font:600 10px var(--mono);letter-spacing:.2em;padding:6px 10px;border-radius:4px;background:rgba(0,0,0,.6);border:1px solid rgba(255,77,94,.5);color:#fff;display:flex;gap:8px;align-items:center}
 .media .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 1.2s infinite}
-.work .meta{padding:22px 4px 0}
 .work .no{font:600 12px var(--mono);color:var(--orange);letter-spacing:.2em}
 .work h3{margin-top:8px;font-size:clamp(20px,2.2vw,28px);font-weight:900}
 .work p{margin-top:8px;color:var(--muted);font-size:15px}
@@ -171,7 +179,7 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
 
 /* reels */
 .reels{grid-column:span 12;display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
-.reel{display:grid;grid-template-columns:minmax(0,260px) 1fr;gap:28px;align-items:center;padding:28px;border-radius:24px;border:1px solid var(--line);background:var(--panel)}
+.reel{display:grid;grid-template-columns:minmax(0,260px) 1fr;column-gap:28px;padding:28px;border-radius:24px;border:1px solid var(--line);background:var(--panel)}
 .reel .phone{padding:8px;border-radius:30px}
 .reel .scr{aspect-ratio:1290/2796;border-radius:24px}
 .reel video{width:100%;height:100%;object-fit:cover;display:block}
@@ -181,7 +189,7 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
 .reel .rec{margin-top:16px;display:inline-flex;gap:8px;align-items:center;font:600 11px var(--mono);letter-spacing:.2em;color:var(--muted)}
 .reel .rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.2s infinite}
 @media (max-width:1100px){.reels{grid-template-columns:1fr}}
-@media (max-width:560px){.reel{grid-template-columns:1fr;justify-items:center;text-align:left}.reel .phone{width:min(260px,80%)}}
+@media (max-width:560px){.reel{grid-template-columns:1fr;grid-template-rows:none;grid-template-areas:"h" "m" "b";row-gap:16px}.reel .phone{width:min(260px,80%);justify-self:center}}
 /* HAPPY orb */
 .orb-wrap{position:relative;aspect-ratio:1;max-width:520px;width:100%;margin:0 auto;cursor:pointer}
 #orb{width:100%;height:100%}
@@ -229,9 +237,9 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
   0%{transform:scaleX(0)}
   35%{transform:scaleX(1);background:repeating-linear-gradient(45deg,#2a3350 0 10px,#222a44 10px 20px);box-shadow:none}
   50%{transform:scaleX(1)}
-  78%{transform:scaleX(.05);background:linear-gradient(90deg,#ff8a1f,#ffc078);box-shadow:0 0 50px rgba(255,138,31,.9)}
-  88%{transform:scaleX(.12)}
-  100%{transform:scaleX(.09);background:linear-gradient(90deg,#ff8a1f,#ffc078);box-shadow:0 0 36px rgba(255,138,31,.7)}
+  78%{transform:scaleX(.01);background:linear-gradient(90deg,#ff8a1f,#ffc078);box-shadow:0 0 50px rgba(255,138,31,.9)}
+  88%{transform:scaleX(.045)}
+  100%{transform:scaleX(.03);background:linear-gradient(90deg,#ff8a1f,#ffc078);box-shadow:0 0 36px rgba(255,138,31,.7)}
 }
 .cmp .arw{position:absolute;top:50%;z-index:2;font-size:40px;line-height:1;color:var(--cyan);text-shadow:0 0 18px var(--cyan);opacity:0;transform:translateY(-50%)}
 .cmp .arw i{display:inline-block}
@@ -243,12 +251,12 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
 .cmp .trail.l{left:0;background:linear-gradient(90deg,transparent,rgba(69,230,255,.8))}
 .cmp .trail.r{right:0;background:linear-gradient(270deg,transparent,rgba(69,230,255,.8))}
 .compare.in .cmp .trail{animation:trail 2.6s cubic-bezier(.2,.7,.2,1) forwards}
-@keyframes trail{0%,45%{opacity:0;width:0}50%{opacity:1;width:0}78%{opacity:1;width:calc(47.5% - 44px)}100%{opacity:.7;width:calc(45.5% - 44px)}}
+@keyframes trail{0%,45%{opacity:0;width:0}50%{opacity:1;width:0}78%{opacity:1;width:calc(49.5% - 44px)}100%{opacity:.7;width:calc(48.5% - 44px)}}
 .cmp .arw.l{left:-4px}.cmp .arw.r{right:-4px}
 .compare.in .cmp .arw.l{animation:pushL 2.6s cubic-bezier(.2,.7,.2,1) forwards}
 .compare.in .cmp .arw.r{animation:pushR 2.6s cubic-bezier(.2,.7,.2,1) forwards}
-@keyframes pushL{0%,42%{opacity:0;left:0}50%{opacity:1;left:0}78%{opacity:1;left:calc(47.5% - 44px)}88%{left:calc(43.5% - 44px)}100%{opacity:1;left:calc(45.5% - 44px)}}
-@keyframes pushR{0%,42%{opacity:0;right:0}50%{opacity:1;right:0}78%{opacity:1;right:calc(47.5% - 44px)}88%{right:calc(43.5% - 44px)}100%{opacity:1;right:calc(45.5% - 44px)}}
+@keyframes pushL{0%,42%{opacity:0;left:0}50%{opacity:1;left:0}78%{opacity:1;left:calc(49.5% - 44px)}88%{left:calc(47.75% - 44px)}100%{opacity:1;left:calc(48.5% - 44px)}}
+@keyframes pushR{0%,42%{opacity:0;right:0}50%{opacity:1;right:0}78%{opacity:1;right:calc(49.5% - 44px)}88%{right:calc(47.75% - 44px)}100%{opacity:1;right:calc(48.5% - 44px)}}
 .compare.in .cmp.b .track{animation:jolt .35s 2.05s}
 @keyframes jolt{25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
 .sq{margin-top:22px;text-align:center}
@@ -262,36 +270,53 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
 .sq .num.done .pre{opacity:1}
 .note{margin-top:20px;font-size:12px;color:var(--muted)}
 
-/* story road */
-.road{margin-top:56px;position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-.road::before,.road .line{content:"";position:absolute;left:24px;right:24px;top:24px;height:1px;background:var(--line)}
-.road .line{height:2px;margin-top:-1px;background:linear-gradient(90deg,var(--cyan),var(--orange));box-shadow:0 0 12px var(--cyan);transform:scaleX(0);transform-origin:0 50%;transition:transform 2.4s cubic-bezier(.2,.7,.2,1) .3s}
-.road.in .line{transform:scaleX(1)}
-.node .pin{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 14px var(--mono);background:var(--bg);border:1px solid var(--line);color:var(--muted);position:relative;z-index:1;transition:border-color .4s,color .4s,box-shadow .4s}
-.road.in .node .pin{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 24px rgba(69,230,255,.5)}
-.road .node:nth-child(3) .pin{transition-delay:.9s}.road .node:nth-child(4) .pin{transition-delay:1.6s}
-.node .box{margin-top:20px;padding:24px;border-radius:18px;border:1px solid var(--line);background:var(--panel)}
-.node .st{font:600 11px var(--mono);letter-spacing:.2em;color:#5dff9d}
-.node h3{margin-top:8px;font-size:clamp(18px,1.8vw,22px);font-weight:900;line-height:1.4}
-.node p{margin-top:10px;color:var(--muted);font-size:14px}
-.node.you .pin{border-style:dashed;border-color:var(--orange);color:var(--orange)}
-.road.in .node.you .pin{border-color:var(--orange);color:var(--orange);box-shadow:0 0 24px rgba(255,138,31,.6);animation:blink 1.1s 2.7s steps(1) infinite}
-.node.you .st{color:var(--orange)}
-.node.you .box{border:1px dashed rgba(255,138,31,.6);background:rgba(255,138,31,.04)}
-.road.in .node.you .box{animation:blinkbox 1.6s 2.7s ease-in-out infinite}
-.node.you a{display:inline-block;margin-top:14px;font:600 13px var(--mono);color:var(--orange);letter-spacing:.1em}
+/* story cases */
+.cases{margin-top:48px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.case{padding:24px;border-radius:18px;border:1px solid var(--line);background:var(--panel)}
+.case .st{display:inline-block;font:600 11px var(--mono);letter-spacing:.15em;color:#5dff9d;padding:4px 10px;border:1px solid rgba(93,255,157,.4);border-radius:999px}
+.case .ind{margin-top:14px;font-size:clamp(18px,1.8vw,22px);font-weight:900;line-height:1.4}
+.case p{margin-top:10px;color:var(--muted);font-size:14px}
+.case.you{border:1px dashed rgba(255,138,31,.6);background:rgba(255,138,31,.04)}
+.case.you .st{color:var(--orange);border-color:rgba(255,138,31,.5);animation:blink 1.1s steps(1) infinite}
+.case.you.in{animation:blinkbox 1.6s 1s ease-in-out infinite}
+.case.you a{display:inline-block;margin-top:14px;font:600 13px var(--mono);color:var(--orange);letter-spacing:.1em}
 @keyframes blink{50%{opacity:.2}}
 @keyframes blinkbox{50%{border-color:rgba(255,138,31,.15);box-shadow:0 0 40px rgba(255,138,31,.25)}}
+
+/* AI担当とは */
+.aiop{margin-top:48px;display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(24px,4vw,56px);padding:clamp(24px,4vw,44px);border-radius:24px;border:1px solid rgba(255,138,31,.35);background:radial-gradient(600px circle at 0 0,rgba(255,138,31,.08),transparent 60%),var(--panel)}
+.aiop .ic{font:600 11px var(--mono);letter-spacing:.2em;color:var(--orange)}
+.aiop h3{margin-top:14px;font-size:clamp(22px,2.6vw,32px);font-weight:900;line-height:1.45}
+.aiop h3 em{font-style:normal;color:var(--orange)}
+.aiop p{margin-top:14px;color:var(--muted);font-size:15px}
+.fit{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px}
+.fit span{color:var(--muted);margin-right:4px}
+.fit i{font-style:normal;padding:4px 12px;border-radius:999px;border:1px solid rgba(69,230,255,.35);color:var(--cyan)}
+.can{margin-top:14px;list-style:none;counter-reset:c;display:grid;gap:10px}
+.can li{counter-increment:c;display:grid;grid-template-columns:auto 1fr;column-gap:14px;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.25);font-size:14px;color:var(--muted)}
+.can li::before{content:"0" counter(c);grid-row:span 2;font:700 22px/1.1 var(--en);color:var(--orange)}
+.can li b{color:var(--text);font-size:16px}
 
 /* grow meter */
 .meter{margin-top:48px;padding:clamp(24px,4vw,40px);border-radius:24px;border:1px solid var(--line);background:var(--panel)}
 .meter .hd{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px;font:600 12px var(--mono);letter-spacing:.2em;color:var(--muted)}
 .meter .hd b{margin-left:8px;font:700 clamp(28px,4vw,48px) var(--en);letter-spacing:0;color:var(--text)}
 .meter .hd .lv b{color:var(--orange);font-family:'Noto Sans JP',sans-serif;font-weight:900;font-size:clamp(22px,3vw,36px)}
-.segs{margin-top:20px;display:grid;grid-template-columns:repeat(12,1fr);gap:6px}
-.segs i{height:18px;border-radius:4px;background:rgba(255,255,255,.06);transition:background .3s,box-shadow .3s}
-.segs i.on{background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 0 12px rgba(69,230,255,.4)}
-.segs i.on:nth-child(n+10){background:linear-gradient(90deg,var(--violet),var(--orange));box-shadow:0 0 12px rgba(255,138,31,.5)}
+.segbox{position:relative;margin-top:64px}
+.segs{display:grid;grid-template-columns:repeat(48,1fr);gap:3px}
+.segs i{height:20px;border-radius:3px;background:rgba(255,255,255,.06);transition:background .25s,box-shadow .25s}
+.segs i:nth-child(12n+1):not(:first-child){margin-left:5px}
+.segs i.on{background:var(--c);box-shadow:0 0 10px var(--c)}
+.bubble{position:absolute;bottom:calc(100% + 14px);left:0;padding:8px 14px;border-radius:12px;background:linear-gradient(100deg,var(--orange),#ffb15c);color:#05070d;font:700 13px/1.4 var(--en);white-space:nowrap;box-shadow:0 8px 30px rgba(255,138,31,.5);opacity:0;pointer-events:none}
+.bubble::after{content:"";position:absolute;left:var(--tail,50%);top:100%;margin-left:-7px;border:7px solid transparent;border-top-color:#ffb15c}
+.bubble b{letter-spacing:.06em}
+.bubble.show{animation:pop 1.4s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes pop{0%{opacity:0;transform:translateY(12px) scale(.6)}14%{opacity:1;transform:scale(1.1)}24%{transform:scale(1)}78%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-10px)}}
+.meter .hd .lv b.up{animation:lvup .6s cubic-bezier(.2,.7,.2,1)}
+@keyframes lvup{30%{transform:scale(1.25);text-shadow:0 0 24px var(--orange)}}
+.meter .hd .lv b{display:inline-block}
+.meter.flash{animation:mflash .7s}
+@keyframes mflash{30%{border-color:rgba(255,138,31,.8);box-shadow:0 0 50px rgba(255,138,31,.25)}}
 .lvs{margin-top:24px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 .lvc{padding:18px;border-radius:14px;border:1px solid var(--line);opacity:.35;transition:opacity .4s,border-color .4s}
 .lvc.on{opacity:1;border-color:rgba(69,230,255,.5)}
@@ -305,7 +330,7 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
 .meter .goal em{font-style:normal;color:var(--orange)}
 
 /* estimate video */
-.est{grid-column:span 12;display:grid;grid-template-columns:1.5fr 1fr;gap:28px;align-items:center;margin-top:20px;padding:28px;border-radius:24px;border:1px solid var(--line);background:var(--panel)}
+.est{grid-column:span 12;display:grid;grid-template-columns:1.5fr 1fr;column-gap:28px;margin-top:20px;padding:28px;border-radius:24px;border:1px solid var(--line);background:var(--panel)}
 .est .media{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);aspect-ratio:16/9;background:#000}
 .est video{width:100%;height:100%;object-fit:cover;display:block}
 .est .no{font:600 12px var(--mono);color:var(--orange);letter-spacing:.2em}
@@ -325,6 +350,10 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
 .pcard .yen .num{font-size:clamp(84px,11vw,150px);line-height:.9;letter-spacing:-.04em}
 .pcard.main .yen .num{background:linear-gradient(180deg,#fff,#ffcf9a 60%,var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent}
 .pcard .yen .unit{font-size:24px}
+.pcard .cond{margin-top:12px;display:inline-block;font-size:13px;color:var(--muted);padding:3px 12px;border:1px solid var(--line);border-radius:999px}
+.pcard .art{position:absolute;right:clamp(10px,4%,44px);top:clamp(40px,9%,72px);width:clamp(136px,34%,240px);opacity:.3;pointer-events:none;animation:float 6s ease-in-out infinite}
+.pcard>:not(.art){position:relative}
+@keyframes float{50%{transform:translateY(-8px)}}
 .pcard ul{margin-top:24px;list-style:none;display:grid;gap:10px}
 .pcard li{display:flex;gap:12px;color:var(--muted);font-size:15px}
 .pcard li::before{content:"▸";color:var(--cyan)}
@@ -368,8 +397,9 @@ footer a:hover{color:var(--cyan)}
 @media (max-width:900px){
   .formula{grid-template-columns:1fr}
   .op{font-size:40px;line-height:1}
+  .op.eq span{display:inline-block;transform:rotate(90deg)}
   .work,.work.big{grid-column:span 12}
-  .work.big{grid-template-columns:1fr}
+  .work.big,.est{grid-template-columns:1fr;grid-template-rows:none;grid-template-areas:"h" "m" "b";row-gap:16px}
   .phones{grid-template-columns:1fr 1fr}
   .phones .phone:last-child{grid-column:span 2;max-width:50%;justify-self:center;width:100%}
   .metrics,.price{grid-template-columns:1fr}
@@ -379,15 +409,12 @@ footer a:hover{color:var(--cyan)}
   .prob .x{display:none}
   .msg{grid-template-columns:1fr}
   .msg .q{font-size:72px}
-  .road{grid-template-columns:1fr;gap:28px}
-  .road::before,.road .line{left:23px;right:auto;top:24px;bottom:24px;width:1px;height:auto}
-  .road .line{width:2px;margin:0 0 0 -.5px;transform:scaleY(0);transform-origin:50% 0}
-  .road.in .line{transform:scaleY(1)}
-  .node{display:grid;grid-template-columns:48px 1fr;gap:20px;align-items:start}
-  .node .box{margin-top:0}
+  .cases{grid-template-columns:1fr 1fr}
   .lvs{grid-template-columns:1fr 1fr}
+  .aiop{grid-template-columns:1fr}
+  .segs{gap:2px}.segs i{height:16px;border-radius:2px}.segs i:nth-child(12n+1):not(:first-child){margin-left:3px}
   .lvc.adv{grid-column:span 2}
-  .est{grid-template-columns:1fr;padding:20px}
+  .est{padding:20px}
 }
 @media (max-width:560px){
   .phones{grid-template-columns:1fr}
@@ -397,6 +424,10 @@ footer a:hover{color:var(--cyan)}
   .btn{padding:18px 26px}
   .tag{font-size:10px;letter-spacing:.12em}
   .hero h1{font-size:11.5vw}
+  .cases{grid-template-columns:1fr}
+  .lvs{grid-template-columns:1fr;gap:8px}.lvc.adv{grid-column:auto}
+  .lvc{display:grid;grid-template-columns:8.5em 1fr;column-gap:14px;padding:14px 16px}
+  .lvc .m,.lvc b{grid-column:1}.lvc p{grid-column:2;grid-row:1/span 2;margin-top:0}.lvc .us{grid-column:2;margin-top:4px}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
@@ -477,15 +508,14 @@ footer a:hover{color:var(--cyan)}
 
     <div class="works">
       <article class="work big rv">
-        <div>
+        <div class="whead"><div class="no">01 — AI PARTNER</div><h3>AIの相棒 HAPPY</h3></div>
+        <div class="wmedia">
           <div class="orb-wrap" id="orbWrap" data-cursor="TALK" role="button" tabindex="0" aria-label="HAPPYを起動するデモ">
             <canvas id="orb"></canvas>
             <div class="orb-ui" id="orbUi">CLICK TO WAKE <b>HAPPY</b></div>
           </div>
         </div>
-        <div class="meta">
-          <div class="no">01 — AI PARTNER</div>
-          <h3>AIの相棒 HAPPY</h3>
+        <div class="wbody">
           <p>「ハッピー」と呼びかけると起動し、「ありがとう、ハッピー」で待機。つながったデータベースから必要なデータを集めて分析し、改善案まで出してくれる、映画のジャービスのような相棒です。</p>
           <div class="say" id="say"><span class="m">// 球体をクリックすると、HAPPYが起動します（デモ）</span></div>
           <p style="margin-top:8px;font-size:12px">※ 会話と数字は、動きを体験していただくためのデモです。</p>
@@ -493,12 +523,14 @@ footer a:hover{color:var(--cyan)}
       </article>
 
       <article class="work rv">
+        <div class="whead"><div class="no">02 — TRAINING</div><h3>AIロープレ</h3></div>
         <div class="media tilt"><span class="live">稼働中</span><img src="img/roleplay.webp" alt="AIロープレの実際の画面。お客様役のAIと会話している" loading="lazy"><div class="scan"></div></div>
-        <div class="meta"><div class="no">02 — TRAINING</div><h3>AIロープレ</h3><p>自社の営業トークを入れて、AIのお客様を相手に声で練習。トーク通りに話せているかを、AIが判定します。</p></div>
+        <div class="wbody"><p>自社の営業トークを入れて、AIのお客様を相手に声で練習。トーク通りに話せているかを、AIが判定します。</p></div>
       </article>
       <article class="work rv d2">
+        <div class="whead"><div class="no">03 — SIMULATION</div><h3>創蓄シミュレーター</h3></div>
         <div class="media tilt"><span class="live">稼働中</span><img src="img/simulator.webp" alt="太陽光と蓄電池の創蓄シミュレーターの実際の画面" loading="lazy"><div class="scan"></div></div>
-        <div class="meta"><div class="no">03 — SIMULATION</div><h3>創蓄シミュレーター</h3><p>屋根に乗るパネルの枚数、原価率と利益を、お客様の前でその場で計算。お客様と自社、両方のメリットを並べて提案できます。</p></div>
+        <div class="wbody"><p>屋根に乗るパネルの枚数、原価率と利益を、お客様の前でその場で計算。お客様と自社、両方のメリットを並べて提案できます。</p></div>
       </article>
 
       <div class="phones">
@@ -509,18 +541,21 @@ footer a:hover{color:var(--cyan)}
 
       <div class="reels">
         <div class="reel rv">
-          <div class="phone tilt"><div class="scr"><video poster="video/meishi.jpg" autoplay muted loop playsinline preload="metadata" aria-label="AI秘書に名刺の写真を送ると、連絡先に自動で登録される実際の画面録画"><source src="video/meishi.mp4" type="video/mp4"><source src="video/meishi.webm" type="video/webm"></video></div></div>
-          <div><div class="no">04 — AI SECRETARY</div><h3>名刺を撮って送るだけ。<br>人脈データベースに自動登録。</h3><p>AI秘書に名刺の写真を送ると、会社名・役職・電話・メールを読み取り、人脈データベースとGoogle連絡先に登録。重複がないかも確かめます。</p><span class="rec">実際の画面録画（早送り）</span></div>
+          <div class="whead"><div class="no">04 — AI SECRETARY</div><h3>名刺を撮って送るだけ。<br>人脈データベースに自動登録。</h3></div>
+          <div class="phone tilt wmedia"><div class="scr"><video poster="video/meishi.jpg" autoplay muted loop playsinline preload="metadata" aria-label="AI秘書に名刺の写真を送ると、連絡先に自動で登録される実際の画面録画"><source src="video/meishi.mp4" type="video/mp4"><source src="video/meishi.webm" type="video/webm"></video></div></div>
+          <div class="wbody"><p>AI秘書に名刺の写真を送ると、会社名・役職・電話・メールを読み取り、人脈データベースとGoogle連絡先に登録。重複がないかも確かめます。</p><span class="rec">実際の画面録画（早送り）</span></div>
         </div>
         <div class="reel rv d2">
-          <div class="phone tilt"><div class="scr"><video poster="video/blog.jpg" autoplay muted loop playsinline preload="metadata" aria-label="AIが提案した5つのテーマから番号を選ぶと、ブログを書き上げる実際の画面録画"><source src="video/blog.mp4" type="video/mp4"><source src="video/blog.webm" type="video/webm"></video></div></div>
-          <div><div class="no">05 — AI WRITER</div><h3>番号を選ぶだけで、<br>ブログが書き上がる。</h3><p>3日に1回、世の中の話題と会社の理念に合ったテーマを5つ提案。気に入った番号を返すだけで、本文と画像まで書き上げて届けます。公開ボタンを押すのは人。</p><span class="rec">実際の画面録画（早送り）</span></div>
+          <div class="whead"><div class="no">05 — AI WRITER</div><h3>番号を選ぶだけで、<br>ブログが書き上がる。</h3></div>
+          <div class="phone tilt wmedia"><div class="scr"><video poster="video/blog.jpg" autoplay muted loop playsinline preload="metadata" aria-label="AIが提案した5つのテーマから番号を選ぶと、ブログを書き上げる実際の画面録画"><source src="video/blog.mp4" type="video/mp4"><source src="video/blog.webm" type="video/webm"></video></div></div>
+          <div class="wbody"><p>3日に1回、世の中の話題と会社の理念に合ったテーマを5つ提案。気に入った番号を返すだけで、本文と画像まで書き上げて届けます。公開ボタンを押すのは、人の役目。</p><span class="rec">実際の画面録画（早送り）</span></div>
         </div>
       </div>
 
       <div class="est rv">
-        <div class="media tilt"><video poster="video/mitsumori.jpg" autoplay muted loop playsinline preload="metadata" aria-label="現場で話したメモから、自社の単価表に沿った見積書の下書きができ、確認が必要な点をAIが書き出す流れ"><source src="video/mitsumori.mp4" type="video/mp4"></video></div>
-        <div><div class="no">06 — ESTIMATE</div><h3>現場で話すだけで、<br>見積書の下書きができる。</h3><p>現場で話したメモをAIに渡すと、自社の単価表に沿った見積書の下書きができ、メモに書かれていない点も書き出します。建設・リフォームの会社で稼働中。</p><span class="rec">実際の導入をもとにしたサンプル（社名・金額は架空）</span></div>
+        <div class="whead"><div class="no">06 — ESTIMATE</div><h3>現場で話すだけで、<br>見積書の下書きができる。</h3></div>
+        <div class="media tilt wmedia"><video poster="video/mitsumori.jpg" autoplay muted loop playsinline preload="metadata" aria-label="現場で話したメモから、自社の単価表に沿った見積書の下書きができ、確認が必要な点をAIが書き出す流れ"><source src="video/mitsumori.mp4" type="video/mp4"></video></div>
+        <div class="wbody"><p>現場で話したメモをAIに渡すと、自社の単価表に沿った見積書の下書きができ、メモに書かれていない点も書き出します。建設・リフォームの会社で稼働中。</p><span class="rec">実際の導入をもとにしたサンプル（社名・金額は架空）</span></div>
       </div>
 
       <div class="next rv">
@@ -578,16 +613,15 @@ footer a:hover{color:var(--cyan)}
       <div class="q rv" aria-hidden="true">“</div>
       <div>
         <blockquote class="rv d1">私はもともとエンジニアではありません。ゼロからAIを学び、自社のシステムを自分たちの手で作ってきました。<br>だからこそ言えます。<em>AIは、一部の大企業だけの武器じゃない。</em></blockquote>
-        <div class="who rv d2">株式会社アールスペース 代表取締役 安田 海斗</div>
+        <div class="who rv d2">株式会社アールスペース <span class="nw">代表取締役 安田 海斗</span></div>
       </div>
     </div>
-    <h2 class="h2 rv" style="margin-top:clamp(72px,10vw,120px)">ここまでの道のり。<br><span class="dim">次のマスは、まだ空いている。</span></h2>
-    <div class="road rv" id="road">
-      <div class="line" aria-hidden="true"></div>
-      <div class="node"><div class="pin">01</div><div class="box"><div class="st">DONE</div><h3>自分たちの会社で</h3><p>営業管理、点検ルート、経費計算、太陽光・蓄電池のシミュレーター。まずは自社の仕事を、自分たちで作ったシステムで回しました。</p></div></div>
-      <div class="node"><div class="pin">02</div><div class="box"><div class="st">DONE</div><h3>訪問販売の会社へ</h3><p>Googleマップのピンと、訪問数を数えるカウンターアプリ。バラバラだった記録をひとつに。誰がどこを得意としているかが見えて、営業の改善が速くなりました。断られたお宅へ二度と伺わない、という特商法の決まりも徹底できるように。</p></div></div>
-      <div class="node"><div class="pin">03</div><div class="box"><div class="st">DONE</div><h3>建設・リフォームの会社へ</h3><p>現場で話したメモから、自社の単価表に沿った見積書の下書きを。業界が変わっても、同じ作り方で形にできました。</p></div></div>
-      <div class="node you"><div class="pin">04</div><div class="box"><div class="st">NEXT</div><h3>次は、御社の番。</h3><p>ここに入るのは、御社の「こんなの欲しかった」。</p><a href="https://www.jicoo.com/t/marugoto-ai/e/rspace" target="_blank" rel="noopener" data-cursor="BOOK">無料診断で相談する →</a></div></div>
+    <h2 class="h2 rv" style="margin-top:clamp(72px,10vw,120px)">業界が変わっても、<wbr><span class="nw">同じ作り方で。</span><br><span class="dim">次のマスは、<wbr><span class="nw">まだ空いている。</span></span></h2>
+    <div class="cases" id="cases">
+      <div class="case rv"><div class="st">導入済み</div><div class="ind">自社（太陽光・蓄電池）</div><p>営業・点検・経理まで、社内の仕事を自分たちで作ったシステムで回しています。</p></div>
+      <div class="case rv d1"><div class="st">導入済み</div><div class="ind">訪問販売の会社</div><p>地図のピンと訪問カウンターを、ひとつに。誰がどこを得意としているかが見えて、断られたお宅へ二度と伺わない特商法の決まりも守れるように。</p></div>
+      <div class="case rv d2"><div class="st">導入済み</div><div class="ind">建設・リフォームの会社</div><p>見積書づくりを、現場で話すだけに。<wbr><span class="nw">（WORKS 06）</span></p></div>
+      <div class="case you rv d3"><div class="st">NEXT</div><div class="ind">次は、御社の番。</div><p>ここに入るのは、御社の「こんなの欲しかった」。</p><a href="https://www.jicoo.com/t/marugoto-ai/e/rspace" target="_blank" rel="noopener" data-cursor="BOOK">無料診断で相談する →</a></div>
     </div>
   </div>
 </section>
@@ -627,13 +661,30 @@ footer a:hover{color:var(--cyan)}
     <div class="formula">
       <div class="card tilt rv"><div class="ic">SYSTEM</div><h3>rabi</h3><p>御社の業務に合わせて、AIでゼロから作る開発の仕組み。</p></div>
       <div class="op rv d1">+</div>
-      <div class="card tilt rv d2"><div class="ic">PEOPLE</div><h3>AI担当</h3><p>社内でAIを使いこなし、システムを育て続ける人。社長ご本人でも。</p></div>
-      <div class="op rv d3">=</div>
+      <div class="card tilt rv d2"><div class="ic">PEOPLE / AI OPERATOR</div><h3>AI担当</h3><p>社内でAIを使いこなし、システムを育て続ける人。社長ご本人でも。</p></div>
+      <div class="op eq rv d3"><span>=</span></div>
       <div class="card result tilt rv d4"><div class="ic">INFRASTRUCTURE</div><h3>AIインフラ</h3><p>作って終わりにならない、会社の地力そのもの。</p></div>
+    </div>
+    <div class="aiop rv">
+      <div>
+        <div class="ic">WHO IS THE AI OPERATOR?</div>
+        <h3>「AI担当」とは、<br>御社の中で<em>AIとシステムの面倒を見る人</em>。</h3>
+        <p>エンジニアでなくて構いません。プログラミングの経験も要りません。必要なのは、自社の仕事をよく知っていることと、新しいものを面白がれること。「AIに詳しい人が社内にいない」なら、1年かけて社内で育てます。</p>
+        <div class="fit"><span>向いている人</span><i>社長ご本人</i><i>現場をよく知る社員</i><i>新しいもの好きな人</i></div>
+      </div>
+      <div>
+        <div class="ic">1年後、AI担当ができること</div>
+        <ol class="can">
+          <li><b>翻訳する</b>現場の「困った」を聞いて、AIに伝わる言葉に直せる</li>
+          <li><b>直す</b>システムの項目や画面を、自分の手で直せる</li>
+          <li><b>広める</b>新しいAIを試して、使えるものを社内に広められる</li>
+          <li><b>進める</b>次に自動化する業務を、自分で選んで進められる</li>
+        </ol>
+      </div>
     </div>
     <div class="meter rv" id="meter">
       <div class="hd"><span>MONTH<b id="mMonth">00</b>/ 12</span><span class="lv">LEVEL<b id="mLv">—</b></span></div>
-      <div class="segs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="segbox" aria-hidden="true"><div class="segs" id="segs"></div><div class="bubble" id="mBubble"></div></div>
       <div class="lvs">
         <div class="lvc"><div class="m">LV.1 ／ 1〜3ヶ月目</div><b>見る</b><p>最初のシステムが動き出す。横で一緒に作りながら、仕組みを知る。</p><div class="us">弊社：作る</div></div>
         <div class="lvc"><div class="m">LV.2 ／ 4〜6ヶ月目</div><b>直せる</b><p>「ここを変えたい」を、自分の手で直せる。</p><div class="us">弊社：教えながら作る</div></div>
@@ -653,9 +704,11 @@ footer a:hover{color:var(--cyan)}
     <h2 class="h2 rv d1">必要なものを、全部ひとつに。</h2>
     <div class="price">
       <div class="pcard main rv">
+        <svg class="art" viewBox="0 0 220 180" aria-hidden="true"><defs><linearGradient id="pa1" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#45e6ff"/><stop offset=".55" stop-color="#8a6cff"/><stop offset="1" stop-color="#ff8a1f"/></linearGradient></defs><g fill="none" stroke="url(#pa1)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="22" width="140" height="96" rx="10"/><path d="M68 118v18M48 136h60"/><path d="M34 100v-10M54 100v-20M74 100v-30M94 100v-40M114 100v-52" stroke-width="8" opacity=".55"/><path d="M30 84l26-12 22 4 26-22 30-16"/><path d="M122 38h12v12"/><circle cx="184" cy="92" r="14"/><path d="M160 150c4-22 44-22 48 0"/><path d="M184 66v-24M176 50l8-8 8 8"/></g><g fill="#ffcf9a"><path d="M196 18l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/><path d="M8 150l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" opacity=".7"/></g></svg>
         <div class="t">BUILD &amp; GROW</div>
         <div class="t2">システム構築・人材育成</div>
         <div class="yen"><span class="pre">月額</span><span class="num">10</span><span class="unit">万円</span></div>
+        <div class="cond">12ヶ月契約</div>
         <ul>
           <li>業務の分解と、御社専用システムの設計・開発</li>
           <li>実際の業務で運用しながら、何度でも一緒に直す</li>
@@ -663,6 +716,7 @@ footer a:hover{color:var(--cyan)}
         </ul>
       </div>
       <div class="pcard rv d2">
+        <svg class="art" viewBox="0 0 220 180" aria-hidden="true"><defs><linearGradient id="pa2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#45e6ff"/><stop offset="1" stop-color="#8a6cff"/></linearGradient></defs><g fill="none" stroke="url(#pa2)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="110" cy="92" r="78" stroke-dasharray="3 9" opacity=".7"/><path d="M40 40h96a16 16 0 0 1 16 16v38a16 16 0 0 1-16 16H76l-20 18v-18H40a16 16 0 0 1-16-16V56a16 16 0 0 1 16-16z"/><path d="M58 75h0M88 75h0M118 75h0" stroke-width="7"/><path d="M118 104h62a14 14 0 0 1 14 14v22a14 14 0 0 1-14 14h-8v14l-16-14h-38a14 14 0 0 1-14-14v-22a14 14 0 0 1 14-14z" stroke="#ff8a1f"/><path d="M134 128h40M134 140h24" stroke="#ff8a1f"/></g><g fill="#a9f4ff"><path d="M182 30l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/><path d="M196 72l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" opacity=".7"/></g></svg>
         <div class="t">AI ADVISOR</div>
         <div class="t2">AI顧問</div>
         <div class="yen"><span class="pre">月額</span><span class="num" style="font-size:clamp(64px,8vw,104px)">1</span><span class="unit">万円</span></div>
@@ -724,6 +778,30 @@ const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const root = document.documentElement;
 let mx = innerWidth / 2, my = innerHeight / 2;
+
+/* ---------- 文節で折り返す ---------- */
+// 漢字・カタカナ・英数字の前で、直前がひらがな・句読点なら折ってよい。1文字だけ残る折り方（「ご」「お」など）はしない
+if (window.Intl && Intl.Segmenter) {
+  const seg = new Intl.Segmenter('ja', { granularity: 'word' });
+  const hira = /\p{Script=Hiragana}$/u, head = /^[\p{Script=Han}\p{Script=Katakana}A-Za-z0-9「『（(]/u, tail = /[、。，！？」』）)]$/u, stem = /^\p{Script=Han}\p{Script=Hiragana}$/u; // stem: 「書き|上げる」のような複合語は折らない
+  const skip = 'h1, pre, script, style, .nw, .say, .count, .kicker, .no, .hud, .marquee, #sqNum, #mMonth, #mLv, .bubble';
+  $$('main h2, main h3, main p, main li, main blockquote, main b, main .lbl, main .cut, main .ind, main .cap span, main .prob span').forEach(el => {
+    if (el.closest(skip)) return;
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), list = [];
+    while (w.nextNode()) if (!w.currentNode.parentElement.closest(skip) && !w.currentNode.__ph) list.push(w.currentNode);
+    let last = '', len = 0;
+    for (const node of list) {
+      node.__ph = 1;
+      const frag = document.createDocumentFragment();
+      for (const { segment } of seg.segment(node.data)) {
+        if (len >= 2 && (tail.test(last) || (hira.test(last) && !stem.test(last) && head.test(segment)))) { frag.appendChild(document.createElement('wbr')); len = 0; }
+        const t = document.createTextNode(segment); t.__ph = 1; frag.appendChild(t); last = segment; len += segment.length;
+      }
+      node.replaceWith(frag);
+    }
+  });
+  root.classList.add('ph');
+}
 
 /* ---------- loader ---------- */
 const loader = $('#loader'), pct = $('#pct'), pbar = $('#pbar');
@@ -965,18 +1043,38 @@ new IntersectionObserver(async ([e], obs) => {
   const c = document.createElement('span'); c.className = 'caret'; term.appendChild(c);
 }, { threshold: .4 }).observe(term);
 
-/* ---------- grow meter ---------- */
-const meter = $('#meter');
+/* ---------- grow meter: 48マス（週単位）で進み、レベルが上がるたびに吹き出し ---------- */
+const meter = $('#meter'), segBox = $('#segs'), bubble = $('#mBubble'), mLv = $('#mLv');
+const names = ['見る', '直せる', '作れる', '任せられる'];
+const stops = [[69, 230, 255], [138, 108, 255], [255, 138, 31]];
+for (let i = 0; i < 48; i++) {
+  const t = i / 47 * 2, k = Math.min(1, Math.floor(t)), f = t - k, [a, b] = [stops[k], stops[k + 1]];
+  const seg = document.createElement('i'); seg.style.setProperty('--c', `rgb(${a.map((v, n) => Math.round(v + (b[n] - v) * f))})`); segBox.appendChild(seg);
+}
+function levelPop(html, at) {
+  bubble.innerHTML = html; bubble.classList.remove('show');
+  const w = bubble.offsetWidth, W = segBox.offsetWidth, x = Math.max(w / 2, Math.min(W - w / 2, at * W));
+  bubble.style.left = x - w / 2 + 'px'; bubble.style.setProperty('--tail', (at * W - x + w / 2) + 'px');
+  void bubble.offsetWidth; bubble.classList.add('show');
+}
 new IntersectionObserver(([e], obs) => {
   if (!e.isIntersecting) return; obs.disconnect();
-  const segs = $$('.segs i', meter), cards = $$('.lvc', meter), names = ['見る', '直せる', '作れる', '任せられる'];
+  const segs = $$('i', segBox), cards = $$('.lvc', meter);
   let m = 0;
   setTimeout(function step() {
-    const l = Math.ceil(++m / 3);
+    const l = Math.ceil(++m / 12);
     segs[m - 1].classList.add('on');
-    $('#mMonth').textContent = String(m).padStart(2, '0'); $('#mLv').textContent = `Lv.${l} ${names[l - 1]}`;
-    cards.forEach((c, i) => c.classList.toggle('on', i < l));
-    if (m < 12) setTimeout(step, reduce ? 0 : 320); else setTimeout(() => cards[4].classList.add('on'), reduce ? 0 : 600);
+    $('#mMonth').textContent = String(Math.ceil(m / 4)).padStart(2, '0');
+    let wait = 70;
+    if (m % 12 === 1) {
+      mLv.textContent = `Lv.${l} ${names[l - 1]}`; mLv.classList.remove('up'); void mLv.offsetWidth; mLv.classList.add('up');
+      cards.forEach((c, i) => c.classList.toggle('on', i < l));
+      levelPop(l === 1 ? `<b>START!</b>　Lv.1「${names[0]}」` : `<b>LEVEL UP!</b>　Lv.${l - 1} → Lv.${l}「${names[l - 1]}」`, (m - .5) / 48);
+      if (l > 1) { meter.classList.remove('flash'); void meter.offsetWidth; meter.classList.add('flash'); }
+      wait = 900;
+    }
+    if (m < 48) setTimeout(step, reduce ? 0 : wait);
+    else setTimeout(() => { cards[4].classList.add('on'); levelPop('<b>CLEAR!</b>　AI担当、誕生。次はAI顧問へ', 1); }, reduce ? 0 : 500);
   }, reduce ? 0 : 500);
 }, { threshold: .4 }).observe(meter);
 

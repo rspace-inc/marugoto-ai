@@ -385,8 +385,11 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
 .faq details p{padding:0 4px 24px 34px;color:var(--muted);font-size:15px;max-width:760px}
 
 /* message */
-.msg{display:grid;grid-template-columns:auto 1fr;gap:clamp(24px,5vw,64px);align-items:start}
-.msg .q{font:700 clamp(80px,12vw,160px)/0.8 var(--en);color:var(--orange);opacity:.8}
+.msg{display:grid;grid-template-columns:minmax(0,380px) 1fr;gap:clamp(24px,5vw,64px);align-items:center}
+.face{position:relative;border-radius:24px;overflow:hidden;background:#f4f9fb;padding-top:28px;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1px rgba(69,230,255,.18)}
+.face img{width:100%;height:auto}
+.face::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,transparent 70%,rgba(4,6,12,.25));pointer-events:none}
+.msg .q{font:700 clamp(72px,9vw,120px)/0.8 var(--en);color:var(--orange);opacity:.8;height:.5em}
 .msg blockquote{font-weight:700;font-size:clamp(20px,2.6vw,32px);line-height:1.7}
 .msg blockquote em{font-style:normal;color:var(--cyan)}
 .msg .who{margin-top:28px;font:500 14px var(--mono);color:var(--muted);letter-spacing:.08em}
@@ -419,6 +422,7 @@ footer a:hover{color:var(--cyan)}
   .prob .x{display:none}
   .msg{grid-template-columns:1fr}
   .msg .q{font-size:72px}
+  .face{max-width:300px;width:80%}
   .cases{grid-template-columns:1fr 1fr}
   .lvs{grid-template-columns:1fr 1fr}
   .aiop{grid-template-columns:1fr}
@@ -620,8 +624,9 @@ footer a:hover{color:var(--cyan)}
   <div class="wrap">
     <div class="kicker rv">04 / STORY</div>
     <div class="msg" style="margin-top:32px">
-      <div class="q rv" aria-hidden="true">“</div>
+      <figure class="face rv"><img src="img/yasuda.jpg" alt="株式会社アールスペース 代表取締役 安田 海斗" loading="lazy" width="900" height="1000"></figure>
       <div>
+        <div class="q rv" aria-hidden="true">“</div>
         <blockquote class="rv d1">私はもともとエンジニアではありません。ゼロからAIを学び、自社のシステムを自分たちの手で作ってきました。<br>だからこそ言えます。<em>AIは、一部の大企業だけの武器じゃない。</em></blockquote>
         <div class="who rv d2">株式会社アールスペース <span class="nw">代表取締役 安田 海斗</span></div>
       </div>
@@ -749,7 +754,7 @@ footer a:hover{color:var(--cyan)}
     <h2 class="h2 rv d1">作って終わりに、しない。</h2>
     <div class="flow" id="flow">
       <div class="fill" id="flowFill"></div>
-      <div class="step"><div class="dot">01</div><div><h3>無料業務診断<small>30 MIN</small></h3><p>今の業務を伺い、「システムで楽になる業務／人に残す業務」をその場で仕分けます。</p></div></div>
+      <div class="step"><div class="dot">01</div><div><h3>無料業務診断<small>30 MIN</small></h3><p>今の業務を伺い、「システムで楽になる業務／人に残す業務」をその場で仕分けます。そのうえで、要件定義として「何を整理すれば良くなるか」を具体的にお伝えします。</p></div></div>
       <div class="step"><div class="dot">02</div><div><h3>業務設計・開発<small>2–4 WEEKS</small></h3><p>御社専用のシステムを構築。最終確認の役割分担（誰が・月に何回見るか）もここで決めます。</p></div></div>
       <div class="step"><div class="dot">03</div><div><h3>運用しながら改善<small>ITERATE</small></h3><p>実際の業務で動かしながらテストと調整を重ね、「ここを直したい」をその場で反映します。</p></div></div>
       <div class="step"><div class="dot">04</div><div><h3>AI名人の育成・AI顧問<small>GROW</small></h3><p>1年かけて、社内でAIを使いこなせる担当者を育てます。育ったあとも、AI顧問として新しいAIと一次情報を届け続けます。</p></div></div>
@@ -777,7 +782,7 @@ footer a:hover{color:var(--cyan)}
   <div class="wrap">
     <div class="kicker rv" style="justify-content:center">11 / START</div>
     <h2 class="big rv d1">まずは、<span class="grad">30分。</span></h2>
-    <p class="rv d2">「どの業務を・どんなシステムで楽にできるか」をその場でお答えします。診断は無料です。合わなければ、それも正直にお伝えします。</p>
+    <p class="rv d2">要件定義として、「何を整理すれば良くなるか」を具体的にお伝えします。診断は無料です。合わなければ、それも正直にお伝えします。</p>
     <div class="btns rv d3">
       <a class="btn magnetic" href="https://www.jicoo.com/t/marugoto-ai/e/rspace" target="_blank" rel="noopener" data-cursor="BOOK">無料の業務診断を予約する <span class="arr">→</span></a>
     </div>

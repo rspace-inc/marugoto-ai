@@ -374,6 +374,16 @@ section{position:relative;z-index:2;padding:clamp(96px,14vw,180px) clamp(16px,6v
 .step h3 small{margin-left:12px;font:500 12px var(--mono);color:var(--orange);letter-spacing:.1em}
 .step p{margin-top:6px;color:var(--muted);font-size:15px;max-width:640px}
 
+/* faq */
+.faq{margin-top:48px;border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:24px 4px;font-weight:700;font-size:clamp(16px,1.8vw,20px)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"Q";font:700 18px var(--en);color:var(--cyan)}
+.faq summary::after{content:"+";font:300 28px/1 var(--en);color:var(--muted);transition:transform .3s}
+.faq details[open] summary::after{transform:rotate(45deg);color:var(--orange)}
+.faq details p{padding:0 4px 24px 34px;color:var(--muted);font-size:15px;max-width:760px}
+
 /* message */
 .msg{display:grid;grid-template-columns:auto 1fr;gap:clamp(24px,5vw,64px);align-items:start}
 .msg .q{font:700 clamp(80px,12vw,160px)/0.8 var(--en);color:var(--orange);opacity:.8}
@@ -747,10 +757,25 @@ footer a:hover{color:var(--cyan)}
   </div>
 </section>
 
+<!-- FAQ -->
+<section>
+  <div class="wrap">
+    <div class="kicker rv">10 / FAQ</div>
+    <h2 class="h2 rv d1">よくある質問。</h2>
+    <div class="faq">
+      <details class="rv"><summary>途中でやめられますか？</summary><p>途中でやめることはできます。ただし、システムの正式な納品は契約からちょうど1年後です。1年に満たずにおやめになった場合、作ったシステムはお渡しできません。</p></details>
+      <details class="rv"><summary>1年後、作ったシステムは誰のものになりますか？</summary><p>御社のものです。契約から1年で正式に納品し、所有権は御社に移ります。</p></details>
+      <details class="rv"><summary>パソコンが苦手でも大丈夫ですか？</summary><p>大丈夫です。パソコンが苦手な方の会社でも、導入した実績があります。社長おひとりの会社でもお引き受けしています。</p></details>
+      <details class="rv"><summary>会社のデータは、どこに置かれますか？</summary><p>御社ごとのローカルフォルダ（御社のパソコンの中）に置くことをおすすめしています。</p></details>
+      <details class="rv"><summary>遠方の会社でも頼めますか？</summary><p>大丈夫です。遠方の会社でもお引き受けしています。</p></details>
+    </div>
+  </div>
+</section>
+
 <!-- FINAL -->
 <section class="final" id="contact">
   <div class="wrap">
-    <div class="kicker rv" style="justify-content:center">10 / START</div>
+    <div class="kicker rv" style="justify-content:center">11 / START</div>
     <h2 class="big rv d1">まずは、<span class="grad">30分。</span></h2>
     <p class="rv d2">「どの業務を・どんなシステムで楽にできるか」をその場でお答えします。診断は無料です。合わなければ、それも正直にお伝えします。</p>
     <div class="btns rv d3">

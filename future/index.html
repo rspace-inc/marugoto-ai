@@ -918,7 +918,7 @@ if (!reduce) (function par() {
 })();
 
 /* ---------- marquee ---------- */
-const words = ['営業管理', 'AI秘書', '社内カレンダー', 'AIロープレ', 'シミュレーター', 'HAPPY', '日報の自動集計', '見積書の自動作成', '顧客管理', 'ルート最適化'];
+const words = Array(8).fill('MARUGOTO AI');
 const mq = $('#mq'); const half = words.map(w => `<span>${w}</span>`).join('');
 mq.innerHTML = half + half;
 

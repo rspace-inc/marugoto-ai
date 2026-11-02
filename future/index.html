@@ -104,6 +104,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;align-items:c
 .marquee{position:relative;z-index:2;border-block:1px solid var(--line);background:rgba(8,12,24,.7);overflow:hidden;padding:18px 0}
 .marquee .track{display:flex;gap:48px;width:max-content;animation:mq 40s linear infinite;font:700 clamp(18px,2.4vw,30px) var(--en);white-space:nowrap}
 .marquee .track span{display:flex;align-items:center;gap:48px;color:rgba(233,241,255,.85)}
+.marquee .track b{display:inline-block;font-weight:inherit;transform:scaleX(1.3);transform-origin:left center}
 .marquee .track span::after{content:"✦";color:var(--orange);font-size:.7em}
 @keyframes mq{to{transform:translateX(-50%)}}
 
@@ -919,8 +920,11 @@ if (!reduce) (function par() {
 
 /* ---------- marquee ---------- */
 const words = Array(8).fill('MARUGOTO AI');
-const mq = $('#mq'); const half = words.map(w => `<span>${w}</span>`).join('');
+const mq = $('#mq'); const half = words.map(w => `<span><b>${w}</b></span>`).join('');
 mq.innerHTML = half + half;
+/* 横に引き伸ばした分だけ、右に余白を足して間隔をそろえる */
+const mqFit = () => mq.querySelectorAll('b').forEach(b => { b.style.marginRight = (b.offsetWidth * .3) + 'px'; });
+mqFit(); document.fonts && document.fonts.ready.then(mqFit); addEventListener('resize', mqFit);
 
 /* ---------- neural network canvas ---------- */
 const cv = $('#net'), cx = cv.getContext('2d');
